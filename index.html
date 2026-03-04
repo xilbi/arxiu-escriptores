@@ -177,6 +177,8 @@ const countryCoords = {
 "EEUU": [-100.0, 38.0], "Japón": [139.6, 35.6], "Desconocido": [0, 0], "Polonia": [19.1, 52.2],
 "Nigeria": [8.6, 9.0], "Irán": [53.6, 32.4], "Sudáfrica": [22.9, -30.5], "Bielorrusia": [27.9, 53.7], "India": [78.9, 20.5],
 "Suecia": [18.6, 60.1], "Cuba": [-79.5, 21.5], "Austria": [14.5, 47.5], "Canadá": [-106.3, 56.1], "Grecia": [23.7, 37.9], "Brasil": [-47.9, -15.8]
+"China": [104.1, 35.8], "Japón": [138.2, 36.2], "Marruecos": [-7.0, 31.7], "Afganistán": [67.7, 33.9], "Rusia": [105.3, 61.5], "Mesopotamia": [46.1, 31.0],
+"Egipto": [30.8, 26.8]
 };
 const geoRules = [
 { keywords: ["españa", "española", "español", "castellana", "valenciana", "catalana", "madrid", "canaria","barcelona", "xilxes"], country: "España" },
@@ -200,6 +202,13 @@ const geoRules = [
 { keywords: ["sueca", "suecia"], country: "Suecia" },
 { keywords: ["griega", "grecia", "mitilene", "atenas"], country: "Grecia" },
 { keywords: ["brasileña", "brasil"], country: "Brasil" },
+    { keywords: ["china", "pequín", "ban zhao", "qiu jin"], country: "China" },
+    { keywords: ["japonesa", "Japón", "kioto", "shikibu"], country: "Japón" },
+    { keywords: ["marruecos", "fev", "túnez", "al-fihri"], country: "Marruecos" },
+    { keywords: ["afgana", "afganistán", "balkhi", "persa"], country: "Afganistán" },
+    { keywords: ["rusa", "rusia", "moscú", "San Petersburgo"], country: "Rusia" }, 
+    { keywords: ["mesopotamia", "acadia", "enheduanna", "sumeria", "irak"], country: "Mesopotamia" },
+    { keywords: ["egipcia", "egipto", "el cairo", "alejandría", "nilo"], country: "Egipto" }
 ];
 function extractCountryFromBio(writer) {
 let found = [];
@@ -1927,3 +1936,4 @@ L'atribució específica de cada obra i autor es pot consultar en la font origin
 </footer>
 </body>
 </html>
+
