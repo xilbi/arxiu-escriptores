@@ -125,6 +125,9 @@ object-position: center top;
 </div>
 </head>
 <body class="pb-12">
+</head>
+<body class="pb-12">
+
 <!-- HEADER SUPERIOR CON GIF -->
 <header class="bg-white border-b border-purple-100 shadow-sm">
   <div class="gif-frame">
@@ -1965,17 +1968,36 @@ function scrollToVisualization(type) {
     }, 800);
   }
 }
+function showGallery() {
+  // Scroll suave al inicio de la página
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+  
+  // Opcional: destacar visualmente la sección de búsqueda
+  setTimeout(() => {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.focus();
+      searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, 800);
+}
 </script>
 <div id="visualization-block">
 <h2 style="text-align:center; margin-bottom:20px;">Mapa de Relaciones entre Escritoras</h2>
-<div id="view-selector" class="mb-6 flex justify-center gap-4">
-  <button onclick="drawTimeline()" class="px-6 py-3 bg-purple-100 text-purple-700 rounded-lg font-semibold hover:bg-purple-200 transition-colors border-2 border-purple-300">
-    <i class="fa-solid fa-timeline mr-2"></i>Línea temporal
-  </button>
-  <button onclick="drawMap()" class="px-6 py-3 bg-orange-100 text-orange-700 rounded-lg font-semibold hover:bg-orange-200 transition-colors border-2 border-orange-300">
-    <i class="fa-solid fa-earth-americas mr-2"></i>Mapa mundi
-  </button>
-</div>
+  <div id="view-selector" class="mb-6 flex justify-center gap-4">
+    <button onclick="drawTimeline()" class="px-6 py-3 bg-purple-100 text-purple-700 rounded-lg font-semibold hover:bg-purple-200 transition-colors border-2 border-purple-300">
+      <i class="fa-solid fa-timeline mr-2"></i>Línea temporal
+    </button>
+    <button onclick="drawMap()" class="px-6 py-3 bg-orange-100 text-orange-700 rounded-lg font-semibold hover:bg-orange-200 transition-colors border-2 border-orange-300">
+      <i class="fa-solid fa-earth-americas mr-2"></i>Mapa mundi
+    </button>
+    <button onclick="showGallery()" class="px-6 py-3 bg-green-100 text-green-700 rounded-lg font-semibold hover:bg-green-200 transition-colors border-2 border-green-300">
+      <i class="fa-solid fa-id-card mr-2"></i>Fichas
+    </button>
+  </div>
 <svg id="mindmap" width="1100" height="750"></svg>
 </div>
 <footer class="mt-20 pb-12 text-center border-t border-purple-100 pt-10">
