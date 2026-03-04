@@ -1,249 +1,307 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Archivo de Escritoras - Biblioteca de Xilxes</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archivo de Escritoras - Biblioteca de Xilxes</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Lora:wght@400;600&display=swap" rel="stylesheet">
 <style>
-        /* 1. CONFIGURACIÓN BASE */
-        :root { --p-purple: #7b2cbf; --p-orange: #f3722c; }
-        body { font-family: 'Lora', serif; background-color: #f8f7ff; scroll-behavior: smooth; }
-        h1, h2, h3 { font-family: 'Playfair Display', serif; }
-        
-        /* 2. BOTONES Y BUSCADOR */
-        .search-focus:focus { box-shadow: 0 0 0 3px rgba(123, 44, 191, 0.2); border-color: var(--p-purple); }
-        .era-btn { transition: all 0.3s ease; }
-        .era-btn.active { background-color: var(--p-purple); color: white; transform: translateY(-2px); border-color: var(--p-purple); }
-        .val-btn.active { background-color: var(--p-orange); color: white; border-color: var(--p-orange); }
-
-        /* 3. EFECTO ARTÍSTICO DE FICHA (Boceto) */
-        .sketch-portrait {
-            filter: grayscale(1) contrast(1.2) brightness(1.1);
-            mix-blend-mode: multiply;
-            transition: all 0.5s ease;
-        }
-        .portrait-container { position: relative; display: inline-block; width: 100%; }
-        .portrait-container::after {
-            content: ""; position: absolute; inset: 0;
-            background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
-            opacity: 0.2; pointer-events: none;
-        }
-
-        /* 4. CONTENEDORES DE VISUALIZACIÓN */
-        #visualization-block {
-            max-width: 1200px; margin: 60px auto; padding: 30px;
-            border: 2px solid #ddd; border-radius: 12px; background: #fafafa;
-            overflow: hidden; /* Evita que el mapa se salga al hacer zoom */
-        }
-        #mindmap { 
-            display: block; background: #ffffff; 
-            cursor: grab; border-radius: 8px;
-        }
-        #mindmap:active { cursor: grabbing; }
-
-        /* 5. MODAL DE ESCRITORA (FICHA ARTÍSTICA) */
-        #writerModal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); /* Más oscuro para resaltar la ficha */
-            display: none; justify-content: center; align-items: center;
-            z-index: 9999999 !important; /* Prioridad máxima sobre el mapa */
-        }
-        #writerModalContent {
-            background: white; width: 95%; max-width: 700px;
-            padding: 30px; border-radius: 15px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            overflow-y: auto; max-height: 90vh;
-            position: relative;
-        }
-        #writerModalClose {
-            position: absolute; top: 15px; right: 20px;
-            font-size: 28px; cursor: pointer; color: #666; transition: 0.3s;
-        }
-        #writerModalClose:hover { color: var(--p-orange); }
-
-        /* 6. TOOLTIPS (LISTADOS FLOTANTES) */
-        #map-list-tooltip, #milestone-tooltip-container {
-            position: absolute; display: none; pointer-events: auto;
-            background-color: white !important; border-radius: 10px;
-            padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            z-index: 1000000; /* Debajo del modal, pero encima del mapa */
-            border: 1px solid #7b2cbf33;
-        }
-        #map-list-tooltip { min-width: 240px; max-height: 350px; overflow-y: auto; }
-        
-        .writer-item-link {
-            display: block; color: var(--p-purple); padding: 8px;
-            font-size: 14px; cursor: pointer; border-radius: 6px;
-            border-bottom: 1px solid #f0f0f0; transition: 0.2s;
-        }
-        .writer-item-link:hover { background: #f3f0ff; color: var(--p-orange); }
-
-        /* 7. SELECTOR DE VISTA */
-        #view-selector button {
-            background: #f3f0ff; color: var(--p-purple); border: 1px solid var(--p-purple);
-            padding: 10px 20px; border-radius: 8px; cursor: pointer;
-            font-weight: 600; transition: 0.3s;
-        }
-        #view-selector button:hover { background: var(--p-purple); color: white; }
-
-       .portrait-wrapper {
-    width: 100%;
-    height: 420px;
-    overflow: hidden;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    background: white !important; /* Fondo blanco para que el filtro multiply no lo oscurezca todo */
-    border: 1px solid #eee;
-}
-
-.portrait-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center top;
-}
-
+/* 1. CONFIGURACIÓN BASE */
+:root { --p-purple: #7b2cbf; --p-orange: #f3722c; }
+body { font-family: 'Lora', serif; background-color: #f8f7ff; scroll-behavior: smooth; }
+h1, h2, h3 { font-family: 'Playfair Display', serif; }
+/* 2. BOTONES Y BUSCADOR */
+.search-focus:focus { box-shadow: 0 0 0 3px rgba(123, 44, 191, 0.2); border-color: var(--p-purple); }
+.era-btn { transition: all 0.3s ease; }
+.era-btn.active { background-color: var(--p-purple); color: white; transform: translateY(-2px); border-color: var(--p-purple); }
+.val-btn.active { background-color: var(--p-orange); color: white; border-color: var(--p-orange); }
+/* 3. EFECTO ARTÍSTICO DE FICHA (Boceto) */
 .sketch-portrait {
-    filter: grayscale(1) contrast(1.1) brightness(1.1);
-    mix-blend-mode: multiply;
+filter: grayscale(1) contrast(1.2) brightness(1.1);
+mix-blend-mode: multiply;
+transition: all 0.5s ease;
 }
-    </style>
+.portrait-container { position: relative; display: inline-block; width: 100%; }
+.portrait-container::after {
+content: ""; position: absolute; inset: 0;
+background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
+opacity: 0.2; pointer-events: none;
+}
+/* 4. CONTENEDORES DE VISUALIZACIÓN */
+#visualization-block {
+max-width: 1200px; margin: 60px auto; padding: 30px;
+border: 2px solid #ddd; border-radius: 12px; background: #fafafa;
+overflow: hidden;
+}
+#mindmap {
+display: block; background: #ffffff;
+cursor: grab; border-radius: 8px;
+}
+#mindmap:active { cursor: grabbing; }
+/* 5. MODAL DE ESCRITORA (FICHA ARTÍSTICA) */
+#writer-modal {
+position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0,0,0,0.8);
+display: none; justify-content: center; align-items: center;
+z-index: 9999999 !important;
+}
+#writer-modal:not(.hidden) { display: flex; }
+#modal-content {
+background: white; width: 95%; max-width: 900px;
+padding: 40px; border-radius: 20px;
+box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+overflow-y: auto; max-height: 90vh;
+position: relative;
+}
+/* 6. TOOLTIPS */
+#map-list-tooltip, #milestone-tooltip-container {
+position: absolute; display: none; pointer-events: auto;
+background-color: white !important; border-radius: 10px;
+padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+z-index: 1000000;
+border: 1px solid #7b2cbf33;
+}
+#map-list-tooltip { min-width: 240px; max-height: 350px; overflow-y: auto; }
+.writer-item-link {
+display: block; color: var(--p-purple); padding: 8px;
+font-size: 14px; cursor: pointer; border-radius: 6px;
+border-bottom: 1px solid #f0f0f0; transition: 0.2s;
+}
+.writer-item-link:hover { background: #f3f0ff; color: var(--p-orange); }
+/* 7. SELECTOR DE VISTA */
+#view-selector button {
+background: #f3f0ff; color: var(--p-purple); border: 1px solid var(--p-purple);
+padding: 10px 20px; border-radius: 8px; cursor: pointer;
+font-weight: 600; transition: 0.3s; margin: 0 5px;
+}
+#view-selector button:hover { background: var(--p-purple); color: white; }
+.portrait-wrapper {
+width: 100%;
+height: 420px;
+overflow: hidden;
+border-radius: 12px;
+margin-bottom: 20px;
+background: white !important;
+border: 1px solid #eee;
+}
+.portrait-wrapper img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+object-position: center top;
+}
+/* Animación suave para los botones */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(123, 44, 191, 0.4); }
+  50% { box-shadow: 0 0 30px rgba(123, 44, 191, 0.6); }
+}
+
+.gif-frame {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f3ff 0%, #ffffff 100%);
+}
+
+.gif-container {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(123, 44, 191, 0.15);
+  max-width: 800px;
+  width: 100%;
+}
+
+.gif-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+</style>		
 
 </head>
 <body class="pb-12">
 
-    <header class="bg-white border-b border-purple-100 sticky top-0 z-40 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3 text-purple-800">
-                <i class="fa-solid fa-book-open-reader text-2xl"></i>
-                <span class="font-bold tracking-tight text-xl">Biblioteca de Xilxes</span>
-            </div>
-            <div class="flex gap-2 bg-gray-100 p-1 rounded-full">
-                <button onclick="switchLanguage('es')" id="btn-es" class="text-xs font-bold px-4 py-1.5 rounded-full transition-all bg-purple-600 text-white shadow-sm">ESPAÑOL</button>
-                <button onclick="switchLanguage('va')" id="btn-va" class="text-xs font-bold px-4 py-1.5 rounded-full transition-all text-purple-600 hover:bg-gray-200">VALENCIÀ</button>
-            </div>
-        </div>
 
-
-
-    </header>
-
-    <section class="py-16 px-4 bg-gradient-to-b from-white to-purple-50">
-        <div class="max-w-4xl mx-auto text-center">
-            <h1 id="main-title" class="text-5xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight">Archivo de Escritoras</h1>
-            <p id="main-subtitle" class="text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto">Un recorrido por las voces femeninas que han transformado el pensamiento y la literatura universal.</p>
-            
-            <div class="relative max-w-2xl mx-auto">
-                <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-purple-400"></i>
-                <input type="text" id="search-input" oninput="filterWriters()" placeholder="Buscar escritora..." 
-                    class="w-full pl-14 pr-6 py-4 rounded-2xl border-2 border-purple-100 bg-white search-focus outline-none transition-all text-lg shadow-md">
-            </div>
-        </div>
-    </section>
-
-    <div class="max-w-7xl mx-auto px-4 mb-12">
-        <div id="era-filters" class="flex flex-wrap justify-center gap-3">
-            </div>
+<!-- HEADER SUPERIOR CON GIF -->
+<header class="bg-white border-b border-purple-100 shadow-sm">
+  <div class="gif-frame">
+    <div class="gif-container">
+      <img src="videoDD8m.gif" alt="Presentación de las escritoras">
     </div>
+  </div>
+</header>
 
-    <main class="max-w-7xl mx-auto px-4">
-        <div id="writers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            </div>
-    </main>
-
-    <div id="writer-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl overflow-hidden shadow-2xl relative">
-            <button onclick="closeModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors">
-                <i class="fa-solid fa-circle-xmark text-3xl"></i>
-            </button>
-            <div id="modal-content" class="p-8 md:p-12 overflow-y-auto max-h-[90vh]">
-                </div>
-        </div>
+<!-- HEADER DE NAVEGACIÓN -->
+<header class="bg-white border-b border-purple-100 sticky top-0 z-40 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-3 text-purple-800">
+      <i class="fa-solid fa-book-open-reader text-2xl"></i>
+      <span class="font-bold tracking-tight text-xl">Biblioteca de Xilxes</span>
     </div>
+    <div class="flex gap-2 bg-gray-100 p-1 rounded-full">
+      <button onclick="switchLanguage('es')" id="btn-es" class="text-xs font-bold px-4 py-1.5 rounded-full transition-all bg-purple-600 text-white shadow-sm">ESPAÑOL</button>
+      <button onclick="switchLanguage('va')" id="btn-va" class="text-xs font-bold px-4 py-1.5 rounded-full transition-all text-purple-600 hover:bg-gray-200">VALENCIÀ</button>
+    </div>
+  </div>
+</header>
 
-   
+<section class="py-16 px-4 bg-gradient-to-b from-white to-purple-50">
 
+<div class="max-w-4xl mx-auto text-center">
 
+<h1 id="main-title" class="text-5xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight">Archivo de Escritoras</h1>
+<p id="main-subtitle" class="text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto">Un recorrido por las voces femeninas que han transformado el pensamiento y la literatura universal.</p>
+<div class="relative max-w-2xl mx-auto">
 
+<i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-purple-400"></i>
+<input type="text" id="search-input" oninput="filterWriters()" placeholder="Buscar escritora..."
+class="w-full pl-14 pr-6 py-4 rounded-2xl border-2 border-purple-100 bg-white search-focus outline-none transition-all text-lg shadow-md">
+</div>
+</div>
+</section>
+</div>
+</section>
+
+<!-- BOTONES DE VISUALIZACIÓN ELEGANTES -->
+<section class="py-8 px-4 bg-white border-y border-purple-100">
+  <div class="max-w-4xl mx-auto text-center">
+    <p id="explore-text" class="text-sm text-gray-600 mb-6 italic">Explora las conexiones geográficas y temporales de las escritoras</p>
+    <div class="flex flex-wrap justify-center gap-4">
+      <button onclick="scrollToVisualization('timeline')" 
+              class="group relative px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-bold shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 overflow-hidden">
+        <span class="absolute inset-0 bg-gradient-to-r from-purple-700 to-purple-800 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+        <span class="relative flex items-center gap-3">
+          <i class="fa-solid fa-timeline text-xl"></i>
+          <span>Ver Línea Temporal</span>
+        </span>
+      </button>
+      
+      <button onclick="scrollToVisualization('map')" 
+              class="group relative px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-bold shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 overflow-hidden">
+        <span class="absolute inset-0 bg-gradient-to-r from-orange-600 to-orange-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+        <span class="relative flex items-center gap-3">
+          <i class="fa-solid fa-earth-americas text-xl"></i>
+          <span>Ver Mapa Mundial</span>
+        </span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<div class="max-w-7xl mx-auto px-4 mb-12">
+<div class="max-w-7xl mx-auto px-4 mb-12">
+<div id="era-filters" class="flex flex-wrap justify-center gap-3">
+</div>
+</div>
+<main class="max-w-7xl mx-auto px-4">
+<div id="writers-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+</div>
+</main>
+<div id="writer-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+<div class="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl overflow-hidden shadow-2xl relative">
+<button onclick="closeModal()" class="absolute top-6 right-6 text-gray-400 hover:text-gray-900 transition-colors">
+<i class="fa-solid fa-circle-xmark text-3xl"></i>
+</button>
+<div id="modal-content" class="p-8 md:p-12 overflow-y-auto max-h-[90vh]">
+</div>
+</div>
+</div>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-    // 1. CONFIGURACIÓN GEOGRÁFICA
-    const countryCoords = {
-        "España": [-3.7, 40.4], "Francia": [2.3, 48.8], "Reino Unido": [-0.1, 51.5],
-        "Grecia": [23.7, 37.9], "Italia": [12.4, 41.9], "Alemania": [13.4, 52.5],
-        "México": [-99.1, 19.4], "Chile": [-70.6, -33.4], "Argentina": [-58.3, -34.6],
-        "EEUU": [-100.0, 38.0], "Japón": [139.6, 35.6], "Desconocido": [0, 0], "Polonia": [19.1, 52.2],
-        "Nigeria": [8.6, 9.0], "Irán": [53.6, 32.4], "Sudáfrica": [22.9, -30.5], "Bielorrusia": [27.9, 53.7], "India": [78.9, 20.5],
-        "Suecia": [18.6, 60.1], "Cuba": [-79.5, 21.5], "Austria": [14.5, 47.5], "Canadá": [-106.3, 56.1], "Grecia": [23.7, 37.9], "Brasil": [-47.9, -15.8]
-    };
-
+// 1. CONFIGURACIÓN GEOGRÁFICA
+const countryCoords = {
+"España": [-3.7, 40.4], "Francia": [2.3, 48.8], "Reino Unido": [-0.1, 51.5],
+"Grecia": [23.7, 37.9], "Italia": [12.4, 41.9], "Alemania": [13.4, 52.5],
+"México": [-99.1, 19.4], "Chile": [-70.6, -33.4], "Argentina": [-58.3, -34.6],
+"EEUU": [-100.0, 38.0], "Japón": [139.6, 35.6], "Desconocido": [0, 0], "Polonia": [19.1, 52.2],
+"Nigeria": [8.6, 9.0], "Irán": [53.6, 32.4], "Sudáfrica": [22.9, -30.5], "Bielorrusia": [27.9, 53.7], "India": [78.9, 20.5],
+"Suecia": [18.6, 60.1], "Cuba": [-79.5, 21.5], "Austria": [14.5, 47.5], "Canadá": [-106.3, 56.1], "Grecia": [23.7, 37.9], "Brasil": [-47.9, -15.8],
+"China": [104.1, 35.8], "Japón": [138.2, 36.2], "Marruecos": [-7.0, 31.7], "Afganistán": [67.7, 33.9], "Rusia": [105.3, 61.5], "Mesopotamia": [46.1, 31.0],
+"Egipto": [30.8, 26.8]
+};
 const geoRules = [
-    { keywords: ["españa", "española", "español", "castellana", "valenciana", "catalana", "madrid", "canaria","barcelona", "xilxes"], country: "España" },
-    { keywords: ["cubana", "cuba", "hispanocubana"], country: "Cuba" },
-    { keywords: ["austriaca", "austria", "viena"], country: "Austria" },
-    { keywords: ["canadiense", "canadá", "ontario"], country: "Canadá" },
-    { keywords: ["estadounidense", "eeuu", "ee.uu", "norteamericana", "nueva york", "afroamericana"], country: "EEUU" },
-    { keywords: ["mexicana", "méxico"], country: "México" },
-    { keywords: ["argentina", "buenos aires"], country: "Argentina" },
-    { keywords: ["chilena", "chile"], country: "Chile" },
-    { keywords: ["italiana", "italia", "roma"], country: "Italia" },
-    { keywords: ["francesa", "francia", "parís"], country: "Francia" },
-    { keywords: ["alemana", "alemania", "berlín"], country: "Alemania" },
-    { keywords: ["nigeriana", "nigeria"], country: "Nigeria" },
-    { keywords: ["iraní", "irán"], country: "Irán" },
-    { keywords: ["polaca", "polonia"], country: "Polonia" },
-    { keywords: ["inglesa", "británica", "reino unido", "londres"], country: "Reino Unido" }, 
-    { keywords: ["sudafricana", "sudáfrica"], country: "Sudáfrica" },
-    { keywords: ["bielorrusa", "bielorrusia"], country: "Bielorrusia" },
-    { keywords: ["india", "hindú"], country: "India" },
-    { keywords: ["sueca", "suecia"], country: "Suecia" },
-    { keywords: ["griega", "grecia", "mitilene", "atenas"], country: "Grecia" },
-    { keywords: ["brasileña", "brasil"], country: "Brasil" },
-
+{ keywords: ["españa", "española", "español", "castellana", "valenciana", "catalana", "madrid", "canaria","barcelona", "xilxes"], country: "España" },
+{ keywords: ["cubana", "cuba", "hispanocubana"], country: "Cuba" },
+{ keywords: ["austriaca", "austria", "viena"], country: "Austria" },
+{ keywords: ["canadiense", "canadá", "ontario"], country: "Canadá" },
+{ keywords: ["estadounidense", "eeuu", "ee.uu", "norteamericana", "nueva york", "afroamericana"], country: "EEUU" },
+{ keywords: ["mexicana", "méxico"], country: "México" },
+{ keywords: ["argentina", "buenos aires"], country: "Argentina" },
+{ keywords: ["chilena", "chile"], country: "Chile" },
+{ keywords: ["italiana", "italia", "roma"], country: "Italia" },
+{ keywords: ["francesa", "francia", "parís"], country: "Francia" },
+{ keywords: ["alemana", "alemania", "berlín"], country: "Alemania" },
+{ keywords: ["nigeriana", "nigeria"], country: "Nigeria" },
+{ keywords: ["iraní", "irán"], country: "Irán" },
+{ keywords: ["polaca", "polonia"], country: "Polonia" },
+{ keywords: ["inglesa", "británica", "reino unido", "londres"], country: "Reino Unido" },
+{ keywords: ["sudafricana", "sudáfrica"], country: "Sudáfrica" },
+{ keywords: ["bielorrusa", "bielorrusia"], country: "Bielorrusia" },
+{ keywords: ["india", "hindú"], country: "India" },
+{ keywords: ["sueca", "suecia"], country: "Suecia" },
+{ keywords: ["griega", "grecia", "mitilene", "atenas"], country: "Grecia" },
+{ keywords: ["brasileña", "brasil"], country: "Brasil" },
+{ keywords: ["china", "pequín", "ban zhao", "qiu jin"], country: "China" },
+{ keywords: ["japonesa", "Japón", "kioto", "shikibu"], country: "Japón" },
+{ keywords: ["marruecos", "fev", "túnez", "al-fihri"], country: "Marruecos" },
+{ keywords: ["afgana", "afganistán", "balkhi", "persa"], country: "Afganistán" },
+{ keywords: ["rusa", "rusia", "moscú", "San Petersburgo"], country: "Rusia" }, 
+{ keywords: ["mesopotamia", "acadia", "enheduanna", "sumeria", "irak"], country: "Mesopotamia" },
+{ keywords: ["egipcia", "egipto", "el cairo", "alejandría", "nilo"], country: "Egipto" }
 ];
-
 function extractCountryFromBio(writer) {
-    let found = [];
-    // Regla automática: Valenciana = España
-    if (writer.isValencian) found.push("España");
-
-    const bioText = (writer.bio && writer.bio[currentLang] ? writer.bio[currentLang] : (writer.bio ? writer.bio.es : "")).toLowerCase();
-    
-    geoRules.forEach(r => {
-        if (r.keywords.some(kw => bioText.includes(kw))) found.push(r.country);
-    });
-    return found.length > 0 ? [...new Set(found)] : ["Desconocido"];
+let found = [];
+if (writer.isValencian) found.push("España");
+const bioText = (writer.bio && writer.bio[currentLang] ? writer.bio[currentLang] : (writer.bio ? writer.bio.es : "")).toLowerCase();
+geoRules.forEach(r => {
+if (r.keywords.some(kw => bioText.includes(kw))) found.push(r.country);
+});
+return found.length > 0 ? [...new Set(found)] : ["Desconocido"];
 }
-
 const timelineMilestones = [
-    { year: 1405, title: "La Ciudad de las Damas", desc: "Christine de Pizan publica la primera utopía feminista.", icon: "📚" },
-    { year: 1490, title: "Tirant lo Blanch", desc: "Publicación en Valencia. Isabel de Villena influye en el ambiente literario de la época.", icon: "🍊", region: "val" },
-    { year: 1791, title: "Derechos de la Mujer", desc: "Olympe de Gouges redacta la Declaración de los Derechos de la Mujer.", icon: "📜" },
-    { year: 1848, title: "Seneca Falls", desc: "Primera convención por los derechos de las mujeres en EEUU.", icon: "🗳️" },
-    { year: 1918, title: "Sufragio Femenino", desc: "Se aprueba el voto femenino en varios países de Europa.", icon: "💜" },
-    { year: 1920, title: "Maria Cambrils", desc: "La valenciana publica 'Feminismo Socialista', referente del pensamiento obrero.", icon: "🍊", region: "val" },
-    { year: 1927, title: "Las Sinsombrero", desc: "Mujeres de la Generación del 27 reivindican su papel en Madrid.", icon: "👒" },
-    { year: 1931, title: "Voto Femenino España", desc: "Clara Campoamor logra el sufragio universal en las Cortes.", icon: "🗳️", region: "global" },
-    { year: 1949, title: "El Segundo Sexo", desc: "Simone de Beauvoir publica su obra fundamental.", icon: "✍️" },
-    { year: 1975, title: "Año Int. de la Mujer", desc: "Declarado por la ONU, marca un hito en el feminismo global.", icon: "🌍" }
+{ year: 1405, title: "La Ciudad de las Damas", desc: "Christine de Pizan publica la primera utopía feminista.", icon: "📚" },
+{ year: 1490, title: "Tirant lo Blanch", desc: "Publicación en Valencia. Isabel de Villena influye en el ambiente literario de la época.", icon: "🍊", region: "val" },
+{ year: 1791, title: "Derechos de la Mujer", desc: "Olympe de Gouges redacta la Declaración de los Derechos de la Mujer.", icon: "📜" },
+{ year: 1848, title: "Seneca Falls", desc: "Primera convención por los derechos de las mujeres en EEUU.", icon: "🗳️" },
+{ year: 1918, title: "Sufragio Femenino", desc: "Se aprueba el voto femenino en varios países de Europa.", icon: "💜" },
+{ year: 1920, title: "Maria Cambrils", desc: "La valenciana publica 'Feminismo Socialista', referente del pensamiento obrero.", icon: "🍊", region: "val" },
+{ year: 1927, title: "Las Sinsombrero", desc: "Mujeres de la Generación del 27 reivindican su papel en Madrid.", icon: "👒" },
+{ year: 1931, title: "Voto Femenino España", desc: "Clara Campoamor logra el sufragio universal en las Cortes.", icon: "🗳️", region: "global" },
+{ year: 1949, title: "El Segundo Sexo", desc: "Simone de Beauvoir publica su obra fundamental.", icon: "✍️" },
+{ year: 1975, title: "Año Int. de la Mujer", desc: "Declarado por la ONU, marca un hito en el feminismo global.", icon: "🌍" }
 ];
-
-        // ESTADO DE LA APP
-    let currentLang = 'es';
-    let currentView = 'gallery';
-    let currentEra = 'all';
-        
-        // DICCIONARIO DE INTERFAZ
-        const i18n = {
-            es: { title: "Archivo de Escritoras", subtitle: "Un recorrido por las voces femeninas que han transformado el pensamiento y la literatura universal.", search: "Buscar escritora...", all: "Todas", valencian: "Valencianas", works: "Obras Destacadas", library: "En Biblioteca Xilxes" },
-            va: { title: "Arxiu d'Escriptores", subtitle: "Un recorregut per les veus femenines que han transformat el pensament i la literatura universal.", search: "Buscar escriptora...", all: "Totes", valencian: "Valencianes", works: "Obres Destacades", library: "A la Biblioteca de Xilxes" }
-        };
-
-        
-        
+// ESTADO DE LA APP
+let currentLang = 'es';
+let currentView = 'gallery';
+let currentEra = 'all';
+// DICCIONARIO DE INTERFAZ
+const i18n = {
+es: { 
+  title: "Archivo de Escritoras", 
+  subtitle: "Un recorrido por las voces femeninas que han transformado el pensamiento y la literatura universal.", 
+  search: "Buscar escritora...", 
+  all: "Todas", 
+  valencian: "Valencianas", 
+  works: "Obras Destacadas", 
+  library: "En Biblioteca Xilxes",
+  explore: "Explora las conexiones geográficas y temporales de las escritoras"
+},
+va: { 
+  title: "Arxiu d'Escriptores", 
+  subtitle: "Un recorregut per les veus femenines que han transformat el pensament i la literatura universal.", 
+  search: "Buscar escriptora...", 
+  all: "Totes", 
+  valencian: "Valencianes", 
+  works: "Obres Destacades", 
+  library: "A la Biblioteca de Xilxes",
+  explore: "Explora les connexions geogràfiques i temporals de les escriptores"
+}
+};
         // BASE DE DATOS (AQUÍ DEBES PEGAR TUS 85 OBJETOS TRADUCIDOS)
        // BASE DE DATOS
         const writers = [
@@ -290,7 +348,7 @@ const timelineMilestones = [
 	image: "https://upload.wikimedia.org/wikipedia/commons/f/ff/Emily_Dickinson_daguerreotype_%28cropped%29.jpg",
         bio: {
             es: "Poeta estadounidense cuya obra destaca por su introspección profunda sobre la muerte, la naturaleza y el yo, utilizando una métrica y puntuación revolucionarias.",
-            va: "Poeta estatunidenca l'obra de la qual destaca per la seua introspecció profunda sobre la mort, la natura i el jo, utilitzant una mètrica i puntuació revolucionàries."
+            va: "Poetessa estatunidenca l'obra de la qual destaca per la seua introspecció profunda sobre la mort, la natura i el jo, utilitzant una mètrica i puntuació revolucionàries."
         },
         works: ["Poemas completos", "Hope is the thing with feathers"], 
         library: [] 
@@ -399,7 +457,7 @@ const timelineMilestones = [
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Angelou_at_Clinton_inauguration_%28cropped_2%29.jpg/250px-Angelou_at_Clinton_inauguration_%28cropped_2%29.jpg",
         bio: {
             es: "Poeta estadounidense y activista por los derechos civiles. Sus memorias narran la superación del trauma y el poder de la voz propia frente a la opresión.",
-            va: "Poeta estatunidenca i activista pels drets civils. Les seues memòries narren la superació del trauma i el poder de la veu pròpia davant l'opressió."
+            va: "Poetessa estatunidenca i activista pels drets civils. Les seues memòries narren la superació del trauma i el poder de la veu pròpia davant l'opressió."
         },
         works: ["Yo sé por qué canta el pájaro enjaulado", "And Still I Rise"], 
         library: [] 
@@ -471,7 +529,7 @@ const timelineMilestones = [
         image: "https://upload.wikimedia.org/wikipedia/commons/7/77/Gloria_Fuertes_%28cropped%29.jpg",
         bio: {
             es: "Poeta española de la 'Generación del 50'. Aunque famosa por su literatura infantil, su poesía para adultos es una defensa crítica de la paz y el feminismo.",
-            va: "Poeta espanyola de la 'Generació del 50'. Encara que famosa per la seua literatura infantil, la seua poesia per a adults és una defensa crítica de la pau i el feminisme."
+            va: "Poetessa espanyola de la 'Generació del 50'. Encara que famosa per la seua literatura infantil, la seua poesia per a adults és una defensa crítica de la pau i el feminisme."
         },
         works: ["Poeta de guardia", "Obras vivas"], 
         library: ["Historia de Gloria", "Obras incompletas"] 
@@ -543,7 +601,7 @@ const timelineMilestones = [
         image: "https://upload.wikimedia.org/wikipedia/commons/d/d9/Adrienne_Rich_%28cropped%29.jpg",
         bio: {
             es: "Poeta y teórica radical estadounidense. Cuestionó la heterosexualidad obligatoria y la institución de la maternidad desde una perspectiva feminista.",
-            va: "Poeta i teòrica radical estatunidenca. Va qüestionar l'heterosexualitat obligatòria i la institució de la maternitat des d'una perspectiva feminista."
+            va: "Poetessa i teòrica radical estatunidenca. Va qüestionar l'heterosexualitat obligatòria i la institució de la maternitat des d'una perspectiva feminista."
         },
         works: ["Nacemos de mujer", "Sobre mentiras, secretos y silencios"], 
         library: ["Atlas d'un món difícil : poemes 1988-1991"] 
@@ -747,7 +805,7 @@ const timelineMilestones = [
         image: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Wis%C5%82awa_Szymborska_2009.10.23_%281%29.jpg", 
         bio: {
             es: "Poeta polaca que utilizaba la ironía y la sencillez para tratar temas filosóficos complejos sobre la existencia y el detalle cotidiano.",
-            va: "Poeta polonesa que utilitzava la ironia i la senzillesa per a tractar temes filosòfics complexos sobre l'existència i el detall quotidià."
+            va: "Poetessa polonesa que utilitzava la ironia i la senzillesa per a tractar temes filosòfics complexos sobre l'existència i el detall quotidià."
         },
         works: ["Fin y principio", "Instante"], 
         library: [] 
@@ -759,7 +817,7 @@ const timelineMilestones = [
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Louise_Gl%C3%BCck_circa_1977_%28cropped%29.jpg/500px-Louise_Gl%C3%BCck_circa_1977_%28cropped%29.jpg",
         bio: {
             es: "Poeta estadounidense premiada con el Nobel. Su voz es austera, precisa y se inspira a menudo en mitos clásicos para tratar traumas personales.",
-            va: "Poeta estatunidenca premiada amb el Nobel. La seua veu és austera, precisa i s'inspira sovint en mites clàssics per a tractar traumes personals."
+            va: "Poetessa estatunidenca premiada amb el Nobel. La seua veu és austera, precisa i s'inspira sovint en mites clàssics per a tractar traumes personals."
         },
         works: ["El iris salvaje", "Averno"], 
         library: [] 
@@ -771,7 +829,7 @@ const timelineMilestones = [
         image: "https://upload.wikimedia.org/wikipedia/commons/archive/f/f3/20230718005550%21Pizarnik_byn.jpg",
         bio: {
             es: "Poeta argentina cuya obra es un viaje alucinatorio hacia el silencio, la infancia perdida y el dolor existencial.",
-            va: "Poeta argentina l'obra de la qual és un viatge al·lucinatori cap al silenci, la infància perduda i el dolor existencial."
+            va: "Poetessa argentina l'obra de la qual és un viatge al·lucinatori cap al silenci, la infància perduda i el dolor existencial."
         },
         works: ["Árbol de Diana", "La condesa sangrienta"], 
         library: [] 
@@ -939,7 +997,7 @@ const timelineMilestones = [
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Josefina_de_la_Torre_Millares.jpg/250px-Josefina_de_la_Torre_Millares.jpg",
         bio: {
             es: "Poeta canaria de la Generación del 27. Además de su obra lírica, destacó como actriz y cantante, siendo una artista polifacética.",
-            va: "Poeta canària de la Generació del 27. A més de la seua obra lírica, va destacar com a actriu i cantant, sent una artista polifacètica."
+            va: "Poetessa canària de la Generació del 27. A més de la seua obra lírica, va destacar com a actriu i cantant, sent una artista polifacètica."
         },
         works: ["Versos y estampas", "Poemas de la isla"], 
         library: [] 
@@ -951,7 +1009,7 @@ const timelineMilestones = [
         image: "undefined",
         bio: {
             es: "Poeta española fundamental del 27. Su obra evolucionó desde el vanguardismo hacia una poesía de hondo sentido espiritual y religioso.",
-            va: "Poeta espanyola fonamental del 27. La seua obra va evolucionar des del avantguardisme cap a una poesia de profund sentit espiritual i religiós."
+            va: "Poetessa espanyola fonamental del 27. La seua obra va evolucionar des del avantguardisme cap a una poesia de profund sentit espiritual i religiós."
         },
         works: ["La voz en el tiempo", "Cántico inútil"], 
         library: [] 
@@ -996,7 +1054,7 @@ const timelineMilestones = [
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Gedenktafel_Muskauer_Str_17_%28Kreuz%29_Audre_Lorde4.jpg/250px-Gedenktafel_Muskauer_Str_17_%28Kreuz%29_Audre_Lorde4.jpg",
         bio: {
             es: "Poeta, ensayista y activista afroamericana. Su obra articula feminismo, antirracismo y lucha LGTBIQ+, convirtiéndola en una de las voces más influyentes del feminismo interseccional.",
-            va: "Poeta, assagista i activista afroamericana. La seua obra articula feminisme, antirracisme i lluita LGTBIQ+, convertint-la en una de les veus més influents del feminisme interseccional."
+            va: "Poetessa, assagista i activista afroamericana. La seua obra articula feminisme, antirracisme i lluita LGTBIQ+, convertint-la en una de les veus més influents del feminisme interseccional."
         },
         works: ["La hermana, la extranjera", "Zami: Una biomitografía"], 
         library: ["La hermana, la extranjera", "Zami : una biomitografía"] 
@@ -1144,7 +1202,7 @@ const timelineMilestones = [
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/N%C3%BAmero_52_verda._Maria-Merc%C3%A8_Mar%C3%A7al_i_Rafael_Vargas_%2815307047704%29.jpg/250px-N%C3%BAmero_52_verda._Maria-Merc%C3%A8_Mar%C3%A7al_i_Rafael_Vargas_%2815307047704%29.jpg",
         bio: {
             es: "Poeta, traductora y activista catalana. Su lema 'a la mujer, la clase baja y la nación oprimida' definió su potente obra lírica.",
-            va: "Poeta, traductora i activista catalana. El seu lema 'a la dona, la classe baixa i la nació oprimida' va definir la seua potent obra lírica."
+            va: "Poetessa, traductora i activista catalana. El seu lema 'a la dona, la classe baixa i la nació oprimida' va definir la seua potent obra lírica."
         },
         works: ["Cau de llunes", "La passió segons Renée Vivien"],
         library: ["Cau de llunes (Antología)"]
@@ -1438,6 +1496,156 @@ const timelineMilestones = [
         },
         works: ["Vides planes", "L’últim serf", "Poemes de Penyamar"],
         library: ["Vides planes"]
+},{
+        id: 102,
+        name: "Ban Zhao",
+        
+        era: { es: "Antigüedad", va: "Antiguitat" },
+        dates: "45 - 116 d.C.",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Ban_Zhao_-_Wushuang_Pu_%28pref_1690%2C_1961%29.jpg/330px-Ban_Zhao_-_Wushuang_Pu_%28pref_1690%2C_1961%29.jpg",
+        isValencian: false,
+        bio: {
+            es: "La primera historiadora conocida de China. Completó el 'Libro de Han' y escribió 'Lecciones para mujeres', un tratado sobre la conducta femenina en la corte imperial. Fue una erudita en astronomía y matemáticas.",
+            va: "La primera historiadora coneguda de la Xina. Va completar el 'Llibre de Han' i va escriure 'Lliçons per a dones', un tractat sobre la conducta femenina a la cort imperial."
+        },
+        works: ["Libro de Han (Hanshu)", "Lecciones para mujeres"],
+        library: []
+},{
+        id: 103,
+        name: "Murasaki Shikibu",
+        
+        era: { es: "Edad Media", va: "Edat Mitjana"},
+        dates: "973 - 1014",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Murasaki_Shikibu_junihitoe.jpg/250px-Murasaki_Shikibu_junihitoe.jpg",
+        isValencian: false,
+        bio: {
+            es: "Escritora japonesa de la corte imperial durante el período Heian. Autora de 'La historia de Genji', considerada la primera novela moderna del mundo. Sus diarios ofrecen una visión única de la vida aristocrática en Japón.",
+            va: "Escriptora japonesa de la cort imperial durant el període Heian. Autora de 'La història de Genji', considerada la primera novel·la moderna del món."
+        },
+        works: ["Genji Monogatari", "Diario de Murasaki Shikibu"],
+        library: []
+},{
+        id: 104,
+        name: "Qiu Jin",
+        
+        era: { es: "Contemporánea", va: "Contemporània"},
+        dates: "1875 - 1907",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Qiu_jin.jpg/250px-Qiu_jin.jpg",
+        isValencian: false,
+        bio: {
+            es: "Revolucionaria, feminista y escritora de China. Fundó una revista para mujeres y luchó contra el vendado de pies. Es una mártir nacional que defendió la modernización y la igualdad de derechos en su país.",
+            va: "Revolucionària, feminista i escriptora de la Xina. Va fundar una revista per a dones i va lluitar contra l'embenat de peus."
+        },
+        works: ["Poemas de la Caballera del Lago del Espejo", "Discursos feministas"],
+        library: []
+},{
+        id: 105,
+        name: "Fatima al-Fihri",
+        
+        era: { es: "Edad Media", va: "Edat Mitjana"},
+        dates: "800 - 880",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e9/Fatima_Fihria_%28cropped%29.jpg/250px-Fatima_Fihria_%28cropped%29.jpg",
+        isValencian: false,
+        bio: {
+            es: "Erudita nacida en Túnez que emigró a Marruecos. Utilizó su herencia para fundar la Mezquita y Universidad de al-Qarawiyyin en Fez, reconocida por la UNESCO como la universidad más antigua del mundo en funcionamiento.",
+            va: "Erudita nascuda a Tunísia que va emigrar al Marroc. Va fundar la Universitat d'al-Qarawiyyin a Fes, la més antiga del món en funcionament."
+        },
+        works: ["Fundación de la Universidad al-Qarawiyyin"],
+        library: []
+},{
+        id: 106,
+        name: "Mirabai",
+        
+        era: {es: "Renacimiento", va: "Renaixement"},
+        dates: "1498 - 1547",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Kangra_painting_of_Mirabai%2C_the_female_Bhakti_saint.jpg/250px-Kangra_painting_of_Mirabai%2C_the_female_Bhakti_saint.jpg",
+        isValencian: false,
+        bio: {
+            es: "Poeta mística de la India y seguidora devota de Krishna. Desafió las normas de casta y género de su época. Sus poemas y canciones (bhajans) son fundamentales en la tradición lírica y espiritual hindú.",
+            va: "Poetessa mística de l'Índia i seguidora devota de Krishna. Va desafiar les normes de casta i gènere de la seua època."
+        },
+        works: ["Poemas devocionales (Bhajans)", "Cantos de amor espiritual"],
+        library: []
+},{
+        id: 107,
+        name: "Rabia Balkhi",
+        
+        era: { es: "Edad Media", va: "Edat Mitjana"},
+        dates: "900 circa (s. X)",
+        image: "undefined",
+        isValencian: false,
+        bio: {
+            es: "Figura mítica de la literatura de Afganistán. Fue la primera mujer en escribir poesía en persa moderno. Sus versos sobre el amor y la libertad la convirtieron en un símbolo de la resistencia cultural en la región de Balkh.",
+            va: "Figura mítica de la literatura de l'Afganistan. Va ser la primera dona a escriure poesia en persa modern."
+        },
+        works: ["Dīwān (Colección de poemas)"],
+        library: []
+},{
+        id: 108,
+        name: "Anna Ajmátova",
+        
+        era: { es: "Moderna", va: "Moderna"},
+        dates: "1889 - 1966",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/%D0%90%D0%BD%D0%BD%D0%B0_%D0%90%D1%85%D0%BC%D0%B0%D1%82%D0%BE%D0%B2%D0%B0_%281924%29.jpg/250px-%D0%90%D0%BD%D0%BD%D0%B0_%D0%90%D1%85%D0%BC%D0%B0%D1%82%D0%BE%D0%B2%D0%B0_%281924%29.jpg",
+        isValencian: false,
+        bio: {
+            es: "Una de las figuras más representativas de la literatura rusa. Su poesía captura el sufrimiento del pueblo bajo el régimen soviético. Fue candidata al Nobel y es un símbolo de resistencia y dignidad espiritual.",
+            va: "Una de les figures més representatives de la literatura russa. La seua poesia captura el patiment del poble sota el règim soviètic."
+        },
+        works: ["Réquiem", "Poema sin héroe"],
+        library: []
+},{
+        id: 109,
+        name: "Catalina II de Rusia",
+        
+        era: { es: "Ilustración", va: "Il·lustració"},
+        dates: "1729 - 1796",
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Portrait_of_Empress_Catherine_II_%28cropped%29%28b%29.jpg/250px-Portrait_of_Empress_Catherine_II_%28cropped%29%28b%29.jpg", 
+        isValencian: false,
+        bio: {
+            es: "Emperatriz de Rusia y una de las figuras más cultas de la Ilustración. Autora de una vasta correspondencia con los filósofos más importantes de su tiempo como Voltaire y Diderot, escribió memorias, comedias satíricas y tratados políticos que buscaban modernizar el sistema legal ruso.",
+            va: "Emperadriu de Rússia i una de les figures més cultes de la Il·lustració. Autora d'una vasta correspondència amb els filòsofs més importants del seu temps com Voltaire i Diderot, escrigué memòries, comèdies satíriques i tractats polítics."
+        },
+        works: ["Instrucción (Nakaz)", "Memorias", "Comedias de costumbres"],
+        library: [],
+}, {
+    id: 110,
+    name: "Enheduanna",
+    
+    era: { es: "Antigüedad", va: "Antiguitat"},
+    dates: "2300 a.C.",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Disk_of_Enheduanna_%282%29.jpg/960px-Disk_of_Enheduanna_%282%29.jpg", 
+    isValencian: false,
+    bio: {
+        es: "Considerada la primera autora con nombre propio en la historia universal. Sacerdotisa y poeta de Mesopotamia, escribió himnos que definieron la teología de su tiempo. Su obra marcó un precedente en la autoría femenina y en la literatura universal.",
+        va: "Considerada la primera autora amb nom propi a la història universal. Sacerdotessa i poetessa de Mesopotàmia, escrigué himnes que definiren la teologia del seu temps. Va ser la primera persona a signar una obra literària."
+    },
+    works: ["Himnos a Inanna", "Exaltación de Inanna"],
+    library: [],
+},{
+  id: 111,
+  name: "Agatha Christie",
+  era: { es: "Contemporánea", va: "Contemporània" },
+  dates: "1890 — 1976",
+  image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Agatha_Christie_in_Nederland_%28detectiveschrijfster%29%2C_bij_aankomst_op_Schiphol_me%2C_Bestanddeelnr_916-8898_%28cropped%29.jpg/250px-Agatha_Christie_in_Nederland_%28detectiveschrijfster%29%2C_bij_aankomst_op_Schiphol_me%2C_Bestanddeelnr_916-8898_%28cropped%29.jpg",
+  bio: {
+    es: "Escritora británica, considerada la autora más vendida de todos los tiempos y una de las figuras fundamentales de la novela policíaca moderna. Creó personajes icónicos como Hércules Poirot y Miss Marple, y perfeccionó la estructura del misterio clásico con tramas ingeniosas, giros inesperados y un dominio excepcional del suspense. Su obra ha influido profundamente en la literatura, el teatro, el cine y la televisión, consolidándola como la 'Reina del Crimen'.",
+    va: "Escriptora britànica, considerada l'autora més venuda de tots els temps i una de les figures fonamentals de la novel·la policíaca moderna. Va crear personatges icònics com Hércules Poirot i Miss Marple, i va perfeccionar l'estructura del misteri clàssic amb trames enginyoses, girs inesperats i un domini excepcional del suspens. La seua obra ha influït profundament en la literatura, el teatre, el cinema i la televisió, consolidant-la com la 'Reina del Crim'."
+  },
+  works: ["Asesinato en el Orient Express", "Diez negritos", "Muerte en el Nilo"],
+  library: ["Asesinato en el campo de golf", "Asesinato en el Orient Express", "Diez negritos", "El hombre del traje color castaño","El Misterioso caso de Styles","El misterio de las siete esferas","La telaraña","Lejos de ti esta primavera","Los cuatro grandes","Némesis","Noche eterna","Pasajero para Francfort","Primeros casos de Poirot","Muerte en la vicaría","El misterio de Pale Horse","Matrimonio de sabuesos","El misterio del tren azul","La muerte visita al dentista","Las manzanas","Matar es fácil","Telón: El último caso de Poirot","Un dios solitario y otros relatos","El misterio de la guía de ferrocarriles","Tercera muchacha","El secreto de Chimneys","El asesinato de Roger Ackroyd","Srta. Marple y trece problemas","La casa torcida","Testigo de cargo","Muerte en las nubes"],
+},{
+  id: 112,
+  name: "Hipatia de Alejandría",
+  era: { es: "Antigüedad", va: "Antiguitat" },
+  dates: "c. 355 — 415",
+  image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Sanzio_01_Hypatia.jpg/250px-Sanzio_01_Hypatia.jpg",
+  bio: {
+    es: "Filósofa, matemática y escritora de la escuela neoplatónica de Alejandría. Fue una de las últimas grandes intelectuales del mundo clásico y destacó por su labor docente y por la redacción y edición de tratados matemáticos y astronómicos, muchos de ellos hoy perdidos. Su obra escrita contribuyó a preservar y transmitir el conocimiento científico de la Antigüedad. Su figura se ha convertido en símbolo de la libertad intelectual y del papel de las mujeres en la historia del pensamiento.",
+    va: "Filòsofa, matemàtica i escriptora de l'escola neoplatònica d'Alexandria. Va ser una de les últimes grans intel·lectuals del món clàssic i va destacar per la seua tasca docent i per la redacció i edició de tractats matemàtics i astronòmics, molts dels quals hui estan perduts. La seua obra escrita va contribuir a preservar i transmetre el coneixement científic de l'Antiguitat. La seua figura s'ha convertit en símbol de la llibertat intel·lectual i del paper de les dones en la història del pensament."
+  },
+  works: ["Comentarios a Diofanto", "Edición de los Elementos de Euclides", "Tratados astronómicos (perdidos)"],
+  library: []
 }
 
 
@@ -1455,639 +1663,391 @@ const timelineMilestones = [
 
 
 
+
+
+
+// AÑADE AQUÍ EL RESTO DE TUS ESCRITORAS (IDs 4-101)
 ];
 
-
-
-
-        function switchLanguage(lang) {
-            currentLang = lang;
-            const btnEs = document.getElementById('btn-es');
-            const btnVa = document.getElementById('btn-va');
-            
-            if(lang === 'es') {
-                btnEs.className = "text-xs font-bold px-4 py-1.5 rounded-full transition-all bg-purple-600 text-white shadow-sm";
-                btnVa.className = "text-xs font-bold px-4 py-1.5 rounded-full transition-all text-purple-600 hover:bg-gray-200";
-            } else {
-                btnVa.className = "text-xs font-bold px-4 py-1.5 rounded-full transition-all bg-purple-600 text-white shadow-sm";
-                btnEs.className = "text-xs font-bold px-4 py-1.5 rounded-full transition-all text-purple-600 hover:bg-gray-200";
-            }
-
-            document.getElementById('main-title').innerText = i18n[lang].title;
-            document.getElementById('main-subtitle').innerText = i18n[lang].subtitle;
-            document.getElementById('search-input').placeholder = i18n[lang].search;
-            
-            renderFilters();
-            filterWriters();
-        }
-
-        function renderFilters() {
-            const eras = ['all', ...new Set(writers.map(w => w.era.es))];
-            const filterContainer = document.getElementById('era-filters');
-            
-            let html = eras.map(era => {
-                const label = era === 'all' ? i18n[currentLang].all : writers.find(w => w.era.es === era).era[currentLang];
-                return `<button onclick="setEra('${era}')" class="era-btn px-6 py-2 rounded-xl bg-white border border-purple-100 text-purple-700 font-semibold shadow-sm hover:border-purple-300 ${currentEra === era ? 'active' : ''}">${label}</button>`;
-            }).join('');
-
-            // Botón Valencianas
-            html += `<button onclick="filterValencianas()" class="era-btn val-btn px-6 py-2 rounded-xl bg-orange-50 border border-orange-100 text-orange-700 font-bold shadow-sm hover:bg-orange-100 ${currentEra === 'valencian' ? 'active' : ''}"><i class="fa-solid fa-star mr-2"></i>${i18n[currentLang].valencian}</button>`;
-
-            filterContainer.innerHTML = html;
-        }
-
-        function setEra(era) {
-            currentEra = era;
-            renderFilters();
-            filterWriters();
-        }
-
-        function filterValencianas() {
-            currentEra = 'valencian';
-            renderFilters();
-            const filtered = writers.filter(w => w.isValencian === true);
-            renderWriters(filtered);
-            document.getElementById('search-input').value = '';
-        }
-
-        function filterWriters() {
-            const query = document.getElementById('search-input').value.toLowerCase();
-            const filtered = writers.filter(w => {
-                const matchesSearch = w.name.toLowerCase().includes(query);
-                const matchesEra = currentEra === 'all' ? true : (currentEra === 'valencian' ? w.isValencian : w.era.es === currentEra);
-                return matchesSearch && matchesEra;
-            });
-            renderWriters(filtered);
-        }
-
-        function renderWriters(list) {
-            const grid = document.getElementById('writers-grid');
-            grid.innerHTML = list.map(w => `
-                <div onclick="openModal(${w.id})" class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer group border border-purple-50">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="p-3 bg-purple-50 rounded-lg group-hover:bg-purple-600 transition-colors text-purple-600 group-hover:text-white"><i class="fa-solid fa-feather-pointed"></i></div>
-                            <span class="text-[10px] font-bold px-2 py-1 bg-gray-100 rounded text-gray-500 uppercase tracking-tighter">${w.era[currentLang]}</span>
-                        </div>
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">${w.name}</h3>
-                        <p class="text-sm text-purple-600 font-medium mb-4">${w.dates}</p>
-                        <p class="text-gray-600 text-sm line-clamp-3 leading-relaxed">${w.bio[currentLang]}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-
-
-
-
-        
-        function openModal(id) {
-    const w = writers.find(writer => writer.id === id);
-    const content = document.getElementById('modal-content');
-    
-    content.innerHTML = `
-        <div class="grid md:grid-cols-5 gap-10">
-            <div class="md:col-span-3">
-                <div class="flex flex-col md:flex-row gap-8 mb-8 items-center md:items-start">
-                    <div class="relative w-40 h-48 flex-shrink-0 bg-[#fdfaf2] rounded-lg shadow-inner overflow-hidden border border-[#d1c7ac] portrait-container">
-                    <img src="${w.image}" 
-     alt="${w.name}" 
-     class="w-full h-full object-cover sketch-portrait"
-     loading="lazy"
-     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(w.name)}&background=f3e8ff&color=7b2cbf';"> </div>
-    	                
-                    <div>
-                        <h2 class="text-4xl font-bold text-gray-900 mb-2">${w.name}</h2>
-                        <p class="text-xl text-purple-600 mb-2 font-medium">${w.dates}</p>
-                        <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">${w.era[currentLang]}</p>
-                        ${w.isValencian ? `<span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-orange-200"><i class="fa-solid fa-location-dot mr-1"></i> Autora Local</span>` : ''}
-                    </div>
-                </div>
-                
-                <div class="border-l-4 border-purple-100 pl-6 py-2 italic text-gray-700 leading-relaxed text-lg">
-                    ${w.bio[currentLang]}
-                </div>
-            </div>
-            
-            <div class="md:col-span-2 space-y-6">
-                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                    <h4 class="font-bold text-gray-800 mb-4 uppercase text-xs tracking-widest border-b pb-2">${i18n[currentLang].works}</h4>
-                    <ul class="text-sm space-y-3 text-gray-600 italic">
-                        ${w.works.map(work => `<li class="flex gap-2"><span>•</span><span>${work}</span></li>`).join('')}
-                    </ul>
-                </div>
-                ${w.library && w.library.length > 0 ? `
-                <div class="bg-pink-50 p-6 rounded-2xl border border-pink-100">
-                    <h4 class="font-bold text-pink-800 mb-4 uppercase text-xs tracking-widest">${i18n[currentLang].library}</h4>
-                    <ul class="text-xs space-y-2">
-                        ${w.library.map(book => `<li class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-pink-500 font-medium">${book}</li>`).join('')}
-                    </ul>
-                </div>` : ''}
-            </div>
-        </div>
-    `;
-    document.getElementById('writer-modal').classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
+function switchLanguage(lang) {
+currentLang = lang;
+const btnEs = document.getElementById('btn-es');
+const btnVa = document.getElementById('btn-va');
+if(lang === 'es') {
+btnEs.className = "text-xs font-bold px-4 py-1.5 rounded-full transition-all bg-purple-600 text-white shadow-sm";
+btnVa.className = "text-xs font-bold px-4 py-1.5 rounded-full transition-all text-purple-600 hover:bg-gray-200";
+} else {
+btnVa.className = "text-xs font-bold px-4 py-1.5 rounded-full transition-all bg-purple-600 text-white shadow-sm";
+btnEs.className = "text-xs font-bold px-4 py-1.5 rounded-full transition-all text-purple-600 hover:bg-gray-200";
 }
-
-        function closeModal() { 
-            document.getElementById('writer-modal').classList.add('hidden'); 
-            document.body.style.overflow = 'auto';
-        }
-
-        // INIT
-        window.onload = () => { renderFilters(); filterWriters(); };
-    
-    
-    
-
-
-
-
-
-
-
-
-// ─────────────────────────────────────────────
-// UTILIDADES
-// ─────────────────────────────────────────────
-
-
-
-function clearSVG() {
-  d3.select("#mindmap").selectAll("*").remove();
-}
-
-function parseBirthYear(dates) {
-  if (!dates) return null;
-  const match = dates.match(/(\d{4})/);
-  return match ? +match[1] : null;
-}
-
-function extractCountry(bio) {
-  if (!bio) return "Desconocido";
-  const text = bio.toLowerCase();
-
-  const countries = {
-    "española": "España",
-    "castellana": "España",
-    "valenciana": "España (Valencia)",
-    "catalana": "España",
-    "francesa": "Francia",
-    "estadounidense": "Estados Unidos",
-    "canadiense": "Canadá",
-    "india": "India",
-    "inglesa": "Reino Unido",
-    "británica": "Reino Unido",
-    "alemana": "Alemania",
-    "polaca": "Polonia",
-    "bielorrusa": "Bielorrusia",
-    "brasileña": "Brasil",
-    "italiana": "Italia",
-    "afroamericana": "Estados Unidos"
-  };
-
-  for (let key in countries) {
-    if (text.includes(key)) return countries[key];
-  }
-
-  return "Desconocido";
-}
-
-
-
-// ─────────────────────────────────────────────
-// MODAL M2
-// ─────────────────────────────────────────────
-
-function openWriterModal(id) {
-    const w = writers.find(writer => writer.id === id);
-    if (!w) return;
-
-    // 1. Cerramos el listado del mapa si está abierto
-    const tooltip = document.getElementById('map-list-tooltip');
-    if (tooltip) tooltip.style.display = 'none';
-
-    const body = document.getElementById('writerModalBody');
-    const bioText = w.bio[currentLang] || w.bio['es'] || "";
-
-    // 2. Construimos la ficha con la maquetación original de la galería
-    body.innerHTML = `
-        <div class="portrait-container">
-            <div class="portrait-wrapper">
-                <img src="${w.img}" class="sketch-portrait" alt="${w.name}" onerror="this.src='https://via.placeholder.com/400x500?text=Imagen+no+disponible'">
-            </div>
-        </div>
-        <div class="mt-4">
-            <div class="flex justify-between items-start mb-2">
-                <div>
-                    <h2 class="text-3xl font-bold text-purple-900 leading-tight">${w.name}</h2>
-                    <p class="text-orange-600 font-bold uppercase tracking-[0.2em] text-xs mt-1">
-                        ${w.years || 'Dates no disponibles'}
-                    </p>
-                </div>
-                <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-                    ${w.era || 'Sense època'}
-                </span>
-            </div>
-            
-            <div class="prose prose-purple max-w-none text-gray-700 leading-relaxed italic border-l-4 border-purple-100 pl-4 my-6">
-                "${bioText}"
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 pt-6 border-t border-gray-100">
-                <div>
-                    <h3 class="text-[11px] font-bold text-purple-400 uppercase tracking-widest mb-3">Obres destacades</h3>
-                    <ul class="text-sm text-gray-600 space-y-2">
-                        ${w.works && w.works.length > 0 
-                            ? w.works.map(work => `<li class="flex items-start"><span class="text-orange-400 mr-2">•</span>${work}</li>`).join('') 
-                            : '<li class="italic text-gray-400">No hay obras registradas</li>'}
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="text-[11px] font-bold text-purple-400 uppercase tracking-widest mb-3">A la biblioteca</h3>
-                    ${w.library ? `
-                        <a href="${w.library}" target="_blank" class="inline-flex items-center gap-2 text-sm font-bold text-white bg-orange-500 hover:bg-purple-700 px-5 py-2.5 rounded-lg transition-all shadow-sm">
-                            <i class="fas fa-book-reader"></i> Veure catàleg
-                        </a>
-                    ` : '<p class="text-xs text-gray-400 italic">No disponible en el catàleg online</p>'}
-                </div>
-            </div>
-        </div>
-    `;
-
-    document.getElementById('writerModal').style.display = 'flex';
-}
-
-function closeWriterModal() {
-  document.getElementById("writerModal").style.display = "none";
-}
-
-// ─────────────────────────────────────────────
-// MINI‑MODAL T3 (para países)
-// ─────────────────────────────────────────────
-
-function showCountryModal(country, x, y) {
-  const modal = document.getElementById("countryModal");
-  const authors = writers.filter(w => extractCountry(w.bio?.es) === country);
-
-  if (!authors.length) {
-    modal.style.display = "none";
-    return;
-  }
-
-  modal.innerHTML = `
-    <h3>${country}</h3>
-    <ul>
-      ${authors.map(a => `
-        <li>
-          <a href="#" onclick="openWriterModal('${a.id}'); return false;">
-            ${a.name}
-          </a>
-        </li>`).join("")}
-    </ul>
-  `;
-
-  modal.style.left = (x + 10) + "px";
-  modal.style.top = (y - 10) + "px";
-  modal.style.display = "block";
-}
-
-function hideCountryModal() {
-  const modal = document.getElementById("countryModal");
-  if (modal) modal.style.display = "none";
-}
-
-// cerrar mini‑modal al hacer clic fuera
-document.addEventListener("click", (e) => {
-  const modal = document.getElementById("countryModal");
-  if (!modal) return;
-  const isCircle = e.target.tagName === "circle";
-  const insideModal = modal.contains(e.target);
-  if (!isCircle && !insideModal) hideCountryModal();
+document.getElementById('main-title').innerText = i18n[lang].title;
+document.getElementById('main-subtitle').innerText = i18n[lang].subtitle;
+document.getElementById('search-input').placeholder = i18n[lang].search;
+document.querySelectorAll('[data-es]').forEach(el => {
+  el.textContent = el.getAttribute(`data-${lang}`);
 });
-
-
+document.getElementById('explore-text').innerText = i18n[lang].explore;
+renderFilters();
+filterWriters();
+}
+function renderFilters() {
+const eras = ['all', ...new Set(writers.map(w => w.era.es))];
+const filterContainer = document.getElementById('era-filters');
+let html = eras.map(era => {
+const label = era === 'all' ? i18n[currentLang].all : writers.find(w => w.era.es === era).era[currentLang];
+return `<button onclick="setEra('${era}')" class="era-btn px-6 py-2 rounded-xl bg-white border border-purple-100 text-purple-700 font-semibold shadow-sm hover:border-purple-300 ${currentEra === era ? 'active' : ''}">${label}</button>`;
+}).join('');
+html += `<button onclick="filterValencianas()" class="era-btn val-btn px-6 py-2 rounded-xl bg-orange-50 border border-orange-100 text-orange-700 font-bold shadow-sm hover:bg-orange-100 ${currentEra === 'valencian' ? 'active' : ''}"><i class="fa-solid fa-star mr-2"></i>${i18n[currentLang].valencian}</button>`;
+filterContainer.innerHTML = html;
+}
+function setEra(era) {
+currentEra = era;
+renderFilters();
+filterWriters();
+}
+function filterValencianas() {
+currentEra = 'valencian';
+renderFilters();
+const filtered = writers.filter(w => w.isValencian === true);
+renderWriters(filtered);
+document.getElementById('search-input').value = '';
+}
+function filterWriters() {
+const query = document.getElementById('search-input').value.toLowerCase();
+const filtered = writers.filter(w => {
+const matchesSearch = w.name.toLowerCase().includes(query);
+const matchesEra = currentEra === 'all' ? true : (currentEra === 'valencian' ? w.isValencian : w.era.es === currentEra);
+return matchesSearch && matchesEra;
+});
+renderWriters(filtered);
+}
+function renderWriters(list) {
+const grid = document.getElementById('writers-grid');
+if (!grid) {
+console.error("No se encontró #writers-grid");
+return;
+}
+grid.innerHTML = list.map(w => {
+const hasLibrary = w.library && w.library.length > 0;
+return `
+<div onclick="openModal(${w.id})" class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer group border ${hasLibrary ? 'border-orange-400 ring-2 ring-orange-200' : 'border-purple-50'}">
+<div class="p-6">
+<div class="flex justify-between items-start mb-4">
+<div class="p-3 ${hasLibrary ? 'bg-orange-100 text-orange-600' : 'bg-purple-50 text-purple-600'} rounded-lg group-hover:${hasLibrary ? 'bg-orange-500 text-white' : 'bg-purple-600 text-white'} transition-colors">
+<i class="fa-solid fa-feather-pointed"></i>
+</div>
+<span class="text-[10px] font-bold px-2 py-1 bg-gray-100 rounded text-gray-500 uppercase tracking-tighter">${w.era[currentLang]}</span>
+</div>
+<h3 class="text-xl font-bold text-gray-800 mb-2">${w.name}</h3>
+<p class="text-sm ${hasLibrary ? 'text-orange-600' : 'text-purple-600'} font-medium mb-4">${w.dates}</p>
+<p class="text-gray-600 text-sm line-clamp-3 leading-relaxed">${w.bio[currentLang]}</p>
+${hasLibrary ? '<div class="mt-3 text-xs text-orange-600 font-bold"><i class="fa-solid fa-book mr-1"></i>Disponible en biblioteca</div>' : ''}
+</div>
+</div>
+`;
+}).join('');
+}
+function openModal(id) {
+const w = writers.find(writer => writer.id === id);
+if (!w) {
+console.error("Autora no encontrada con ID:", id);
+return;
+}
+const content = document.getElementById('modal-content');
+const hasLibrary = w.library && w.library.length > 0;
+content.innerHTML = `
+<div class="grid md:grid-cols-5 gap-10">
+<div class="md:col-span-3">
+<div class="flex flex-col md:flex-row gap-8 mb-8 items-center md:items-start">
+<div class="relative w-40 h-48 flex-shrink-0 bg-[#fdfaf2] rounded-lg shadow-inner overflow-hidden border border-[#d1c7ac] portrait-container">
+<img src="${w.image}"
+alt="${w.name}"
+class="w-full h-full object-cover sketch-portrait"
+loading="lazy"
+onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(w.name)}&background=f3e8ff&color=7b2cbf';"> 
+</div>
+<div class="flex-1">
+<h2 class="text-4xl font-bold text-gray-900 mb-2">${w.name}</h2>
+<p class="text-xl ${hasLibrary ? 'text-orange-600' : 'text-purple-600'} mb-2 font-medium">${w.dates}</p>
+<p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">${w.era[currentLang]}</p>
+<div class="flex flex-wrap gap-2">
+${w.isValencian ? `<span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-orange-200"><i class="fa-solid fa-location-dot mr-1"></i> Autora Local</span>` : ''}
+${hasLibrary ? `<span class="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border border-pink-200"><i class="fa-solid fa-book mr-1"></i> En Biblioteca</span>` : ''}
+</div>
+</div>
+</div>
+<div class="border-l-4 border-purple-100 pl-6 py-2 italic text-gray-700 leading-relaxed text-lg">
+${w.bio[currentLang]}
+</div>
+</div>
+<div class="md:col-span-2 space-y-6">
+<div class="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+<h4 class="font-bold text-gray-800 mb-4 uppercase text-xs tracking-widest border-b pb-2">${i18n[currentLang].works}</h4>
+<ul class="text-sm space-y-3 text-gray-600 italic">
+${w.works && w.works.length > 0 ? w.works.map(work => `<li class="flex gap-2"><span>•</span><span>${work}</span></li>`).join('') : '<li class="italic text-gray-400">No hay obras registradas</li>'}
+</ul>
+</div>
+${hasLibrary ? `
+<div class="bg-pink-50 p-6 rounded-2xl border border-pink-100">
+<h4 class="font-bold text-pink-800 mb-4 uppercase text-xs tracking-widest">${i18n[currentLang].library}</h4>
+<ul class="text-xs space-y-2">
+${w.library.map(book => `<li class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-pink-500 font-medium">${book}</li>`).join('')}
+</ul>
+</div>` : ''}
+</div>
+</div>
+`;
+const modal = document.getElementById('writer-modal');
+modal.classList.remove('hidden');
+document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+const modal = document.getElementById('writer-modal');
+modal.classList.add('hidden');
+document.body.style.overflow = 'auto';
+}
 // ─────────────────────────────────────────────
-// LÍNEA TEMPORAL (sin solapamientos)
+// LÍNEA TEMPORAL
 // ─────────────────────────────────────────────
-
 function drawTimeline() {
-    // 1. CONFIGURACIÓN INICIAL Y LIMPIEZA
-    const svg = d3.select("#mindmap");
-    const width = 1100;
-    const height = 750;
-    const midY = height / 2;
-    svg.selectAll("*").remove();
-
-    // 2. CONTENEDOR DE ZOOM Y FILTROS (GLOW)
-    const g = svg.append("g");
-    const zoom = d3.zoom().scaleExtent([0.5, 8]).on("zoom", (e) => g.attr("transform", e.transform));
-    svg.call(zoom);
-
-    const defs = svg.append("defs");
-    const filter = defs.append("filter").attr("id", "glow");
-    filter.append("feGaussianBlur").attr("stdDeviation", "2.5").attr("result", "coloredBlur");
-    const feMerge = filter.append("feMerge");
-    feMerge.append("feMergeNode").attr("in", "coloredBlur");
-    feMerge.append("feMergeNode").attr("in", "SourceGraphic");
-
-    // 3. PROCESAMIENTO DE FECHAS
-    const processedData = writers.map(w => {
-        const match = w.dates.match(/(\d{3,4})/);
-        let year = match ? parseInt(match[1]) : 2000;
-        if (w.dates.toLowerCase().includes("a.c")) year = -year;
-        return { ...w, year: year };
-    }).sort((a, b) => a.year - b.year);
-
-    // 4. ESCALA ELÁSTICA (Distorsión temporal)
-    const xScale = d3.scaleLinear()
-        .domain([-600, 476, 1492, 1850, 1950, 2026]) 
-        .range([100, 400, 800, 1500, 3000, 5000]);
-
-    // 5. FONDO DE ERAS
-    const eras = [
-        { name: "Antigüedad", start: -700, end: 476, color: "#fef2f2" },
-        { name: "Media", start: 476, end: 1492, color: "#f0fdf4" },
-        { name: "Moderna", start: 1492, end: 1789, color: "#eff6ff" },
-        { name: "Contemporánea", start: 1789, end: 2026, color: "#faf5ff" }
-    ];
-
-    eras.forEach(era => {
-        g.append("rect")
-            .attr("x", xScale(era.start)).attr("y", 0)
-            .attr("width", xScale(era.end) - xScale(era.start)).attr("height", height)
-            .attr("fill", era.color).attr("opacity", 0.8);
-        
-        g.append("text")
-            .attr("x", xScale(era.start) + 10).attr("y", 40)
-            .text(era.name).attr("font-size", "14px").attr("class", "fill-gray-400 font-bold uppercase");
-    });
-
-    // 6. MARCADORES DE FECHA (Ticks)
-    const ticks = [-500, 0, 500, 1000, 1500, 1700, 1800, 1900, 1920, 1940, 1960, 1980, 2000, 2026];
-    ticks.forEach(t => {
-        g.append("line")
-            .attr("x1", xScale(t)).attr("x2", xScale(t))
-            .attr("y1", midY - 15).attr("y2", midY + 15)
-            .attr("stroke", "#7b2cbf").attr("stroke-width", 2).attr("opacity", 0.4);
-
-        g.append("text")
-            .attr("x", xScale(t)).attr("y", midY + 40)
-            .text(t < 0 ? Math.abs(t) + " a.C." : t)
-            .attr("text-anchor", "middle").attr("font-size", "12px").attr("fill", "#7b2cbf").attr("font-weight", "bold");
-    });
-
-    // 7. SIMULACIÓN FÍSICA (Anticolisión)
-    const simulation = d3.forceSimulation(processedData)
-        .force("x", d3.forceX(d => xScale(d.year)).strength(2))
-        .force("y", d3.forceY(midY).strength(0.1))
-        .force("collide", d3.forceCollide(55)) 
-        .stop();
-
-    for (let i = 0; i < 250; ++i) simulation.tick();
-
-    // 8. DIBUJAR HITOS HISTÓRICOS (Con Glow y Repasado)
-    const milestoneGroup = g.selectAll(".milestone")
-        .data(timelineMilestones)
-        .enter().append("g")
-        .attr("class", "milestone")
-        .attr("transform", d => `translate(${xScale(d.year)}, ${midY - 140})`);
-
-    milestoneGroup.append("circle")
-        .attr("r", 18)
-        .attr("fill", d => d.region === 'val' ? "#fff7ed" : "#fef3c7")
-        .attr("stroke", d => d.region === 'val' ? "#f97316" : "#d97706")
-        .attr("stroke-width", 2)
-        .style("filter", "url(#glow)")
-        .style("cursor", "help");
-
-    milestoneGroup.append("text")
-        .attr("text-anchor", "middle")
-        .attr("y", 6)
-        .style("font-size", "16px")
-        .text(d => d.icon);
-
-    const labels = milestoneGroup.append("g").attr("transform", "translate(0, -25)");
-
-    // El repasado blanco para legibilidad
-    labels.append("text")
-        .text(d => d.title)
-        .attr("text-anchor", "middle")
-        .attr("font-size", "11px")
-        .attr("font-weight", "bold")
-        .attr("stroke", "white")
-        .attr("stroke-width", "4px")
-        .attr("stroke-linejoin", "round")
-        .attr("fill", "white");
-
-    labels.append("text")
-        .text(d => d.title)
-        .attr("text-anchor", "middle")
-        .attr("font-size", "11px")
-        .attr("font-weight", "bold")
-        .attr("fill", d => d.region === 'val' ? "#c2410c" : "#92400e");
-
-    // Tooltip de los hitos
-    // A. Crea el elemento fuera del SVG (hazlo una sola vez al principio de tu script o dentro de la función)
-if (!document.getElementById('milestone-tooltip-container')) {
-    d3.select("body").append("div").attr("id", "milestone-tooltip-container");
-}
-const tooltipDiv = d3.select("#milestone-tooltip-container");
-
-// B. Nueva lógica de interacción dentro de drawTimeline
-milestoneGroup.on("mouseover", function(e, d) {
-    d3.select(this).select("circle").transition().attr("r", 22); // Efecto visual
-
-    tooltipDiv.style("display", "block")
-        .html(`
-            <div style="font-weight: bold; color: #92400e; font-size: 13px; margin-bottom: 4px;">${d.title} (${d.year < 0 ? Math.abs(d.year) + ' a.C.' : d.year})</div>
-            <div style="color: #4b5563; font-size: 11px; line-height: 1.4;">${d.desc}</div>
-        `);
-})
-.on("mousemove", function(e) {
-    // Sigue al ratón con un pequeño offset
-    tooltipDiv
-        .style("left", (e.pageX + 15) + "px")
-        .style("top", (e.pageY - 20) + "px");
-})
-.on("mouseout", function() {
-    d3.select(this).select("circle").transition().attr("r", 18);
-    tooltipDiv.style("display", "none");
+const svg = d3.select("#mindmap");
+const width = 1100;
+const height = 750;
+const midY = height / 2;
+svg.selectAll("*").remove();
+const g = svg.append("g");
+const zoom = d3.zoom().scaleExtent([0.5, 8]).on("zoom", (e) => g.attr("transform", e.transform));
+svg.call(zoom);
+const processedData = writers.map(w => {
+const match = w.dates.match(/(\d{3,4})/);
+let year = match ? parseInt(match[1]) : 2000;
+if (w.dates.toLowerCase().includes("a.c")) year = -year;
+return { ...w, year: year };
+}).sort((a, b) => a.year - b.year);
+const xScale = d3.scaleLinear()
+.domain([-600, 476, 1492, 1850, 1950, 2026])
+.range([100, 400, 800, 1500, 3000, 5000]);
+const eras = [
+{ name: "Antigüedad", start: -700, end: 476, color: "#fef2f2" },
+{ name: "Media", start: 476, end: 1492, color: "#f0fdf4" },
+{ name: "Moderna", start: 1492, end: 1789, color: "#eff6ff" },
+{ name: "Contemporánea", start: 1789, end: 2026, color: "#faf5ff" }
+];
+eras.forEach(era => {
+g.append("rect")
+.attr("x", xScale(era.start)).attr("y", 0)
+.attr("width", xScale(era.end) - xScale(era.start)).attr("height", height)
+.attr("fill", era.color).attr("opacity", 0.8);
 });
-
-    // 9. DIBUJAR ESCRITORAS
-    const nodes = g.selectAll(".writer-node")
-        .data(processedData).enter().append("g")
-        .attr("transform", d => `translate(${d.x}, ${d.y})`)
-        .style("cursor", "pointer")
-        .on("click", (e, d) => openModal(d.id));
-
-    nodes.append("line")
-        .attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", d => midY - d.y)
-        .attr("stroke", "#d8b4fe").attr("stroke-dasharray", "4,4");
-
-    nodes.append("circle").attr("r", 6).attr("fill", "#7b2cbf").attr("stroke", "#fff").attr("stroke-width", 2);
-
-    nodes.append("text")
-        .text(d => d.name)
-        .attr("y", d => d.y > midY ? 25 : -15)
-        .attr("text-anchor", "middle")
-        .attr("font-size", "13px")
-        .attr("class", "fill-purple-950 font-bold")
-        .style("text-shadow", "1px 1px 0px #fff, -1px -1px 0px #fff");
+const ticks = [-500, 0, 500, 1000, 1500, 1700, 1800, 1900, 1920, 1940, 1960, 1980, 2000, 2026];
+ticks.forEach(t => {
+g.append("line")
+.attr("x1", xScale(t)).attr("x2", xScale(t))
+.attr("y1", midY - 15).attr("y2", midY + 15)
+.attr("stroke", "#7b2cbf").attr("stroke-width", 2).attr("opacity", 0.4);
+g.append("text")
+.attr("x", xScale(t)).attr("y", midY + 40)
+.text(t < 0 ? Math.abs(t) + " a.C." : t)
+.attr("text-anchor", "middle").attr("font-size", "12px").attr("fill", "#7b2cbf").attr("font-weight", "bold");
+});
+const simulation = d3.forceSimulation(processedData)
+.force("x", d3.forceX(d => xScale(d.year)).strength(2))
+.force("y", d3.forceY(midY).strength(0.1))
+.force("collide", d3.forceCollide(55))
+.stop();
+for (let i = 0; i < 250; ++i) simulation.tick();
+const nodes = g.selectAll(".writer-node")
+.data(processedData).enter().append("g")
+.attr("transform", d => `translate(${d.x}, ${d.y})`)
+.style("cursor", "pointer")
+.on("click", (e, d) => openModal(d.id));
+nodes.append("line")
+.attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", d => midY - d.y)
+.attr("stroke", "#d8b4fe").attr("stroke-dasharray", "4,4");
+nodes.append("circle")
+.attr("r", 6)
+.attr("fill", d => (d.library && d.library.length > 0) ? "#f3722c" : "#7b2cbf")
+.attr("stroke", "#fff")
+.attr("stroke-width", 2);
+nodes.append("text")
+.text(d => d.name)
+.attr("y", d => d.y > midY ? 25 : -15)
+.attr("text-anchor", "middle")
+.attr("font-size", "13px")
+.attr("class", "fill-purple-950 font-bold")
+.style("text-shadow", "1px 1px 0px #fff, -1px -1px 0px #fff");
 }
-
 // ─────────────────────────────────────────────
-// MAPA MUNDI ARTÍSTICO (un punto por país)
+// MAPA MUNDI
 // ─────────────────────────────────────────────
-
 async function drawMap() {
-  const svg = d3.select("#mindmap");
-  const width = 1100, height = 750;
-  
-  svg.selectAll("*").remove();
-  
-  let tooltip = d3.select("#map-list-tooltip");
-  if (tooltip.empty()) {
-    tooltip = d3.select("body").append("div").attr("id", "map-list-tooltip");
-  }
-  
-  const g = svg.append("g").attr("class", "map-content");
-  
-  const zoom = d3.zoom()
-    .scaleExtent([1, 12])
-    .on("zoom", (event) => {
-      if (event.transform) {
-        g.attr("transform", event.transform);
+const svg = d3.select("#mindmap");
+const width = 1100, height = 750;
+svg.selectAll("*").remove();
+let tooltip = d3.select("#map-list-tooltip");
+if (tooltip.empty()) {
+tooltip = d3.select("body").append("div").attr("id", "map-list-tooltip");
+}
+const g = svg.append("g").attr("class", "map-content");
+const zoom = d3.zoom()
+.scaleExtent([1, 12])
+.on("zoom", (event) => {
+if (event.transform) {
+g.attr("transform", event.transform);
+}
+});
+svg.call(zoom).on("dblclick.zoom", null);
+const projection = d3.geoMercator().scale(150).translate([width / 2, height / 1.5]);
+const path = d3.geoPath().projection(projection);
+try {
+const world = await d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson");
+g.selectAll("path")
+.data(world.features)
+.enter().append("path")
+.attr("d", path)
+.attr("fill", "#f3f4f6")
+.attr("stroke", "#d1d5db")
+.attr("stroke-width", 0.5);
+// Agrupación CON detección de biblioteca
+const countryGroups = {};
+writers.forEach(w => {
+const countries = extractCountryFromBio(w);
+const hasLibrary = w.library && w.library.length > 0;
+countries.forEach(c => {
+if (!countryGroups[c]) countryGroups[c] = { name: c, count: 0, authors: [], hasAnyLibrary: false };
+countryGroups[c].count++;
+countryGroups[c].authors.push({ id: w.id, name: w.name, hasLibrary: hasLibrary });
+if (hasLibrary) countryGroups[c].hasAnyLibrary = true;
+});
+});
+const radiusScale = d3.scaleSqrt().domain([1, 25]).range([12, 45]);
+const dots = g.selectAll(".country-group")
+.data(Object.keys(countryGroups).map(k => {
+const p = projection(countryCoords[k] || [0,0]);
+return { ...countryGroups[k], x: p[0], y: p[1] };
+}).filter(d => d.x !== 0))
+.enter().append("g")
+.attr("transform", d => `translate(${d.x}, ${d.y})`);
+dots.append("circle")
+.attr("r", d => radiusScale(d.count))
+.attr("fill", d => {
+if (d.hasAnyLibrary) return "rgba(243, 114, 44, 0.6)";
+return d.name === "España" ? "rgba(243, 114, 44, 0.6)" : "rgba(123, 44, 191, 0.6)";
+})
+.attr("stroke", d => {
+if (d.hasAnyLibrary) return "#f3722c";
+return d.name === "España" ? "#f3722c" : "#7b2cbf";
+})
+.attr("stroke-width", 2)
+.style("cursor", "pointer")
+.on("mouseenter", function(e, d) {
+d3.select(this).attr("opacity", 1).attr("stroke-width", 4);
+// Lista con icono 📚 para autoras con biblioteca
+const listHtml = d.authors.sort((a,b) => a.name.localeCompare(b.name))
+.map(a => `<div class="writer-item-link"
+style="padding:8px; border-bottom:1px solid #eee; color:#7b2cbf; cursor:pointer;"
+onclick="openModal(${a.id}); d3.select('#map-list-tooltip').style('display','none');">
+• ${a.name} ${a.hasLibrary ? '<span style="color:#f3722c;font-size:10px;"> 📚</span>' : ''}
+</div>`).join("");
+tooltip.style("display", "block")
+.html(`<div style="font-weight:bold; padding-bottom:5px; border-bottom:2px solid #7b2cbf; margin-bottom:8px;">${d.name} (${d.count})</div>` + listHtml)
+.style("left", (e.pageX + 15) + "px")
+.style("top", (e.pageY - 15) + "px");
+});
+svg.on("click", () => tooltip.style("display", "none"));
+dots.append("text")
+.text(d => d.count)
+.attr("text-anchor", "middle")
+.attr("dy", ".35em")
+.attr("fill", "#fff")
+.style("font-weight", "bold")
+.style("pointer-events", "none")
+.style("font-size", d => (radiusScale(d.count) * 0.7) + "px");
+} catch (err) { console.error(err); }
+}
+// INIT
+window.onload = () => { 
+console.log("Inicializando aplicación...");
+console.log("Total escritoras:", writers.length);
+renderFilters(); 
+filterWriters();
+drawTimeline();
+console.log("Grid renderizado correctamente");
+};
+function scrollToVisualization(type) {
+  const vizBlock = document.getElementById('visualization-block');
+  if (vizBlock) {
+    vizBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setTimeout(() => {
+      if (type === 'timeline') {
+        drawTimeline();
+      } else if (type === 'map') {
+        drawMap();
       }
-    });
-  
-  svg.call(zoom).on("dblclick.zoom", null);
-  
-  const projection = d3.geoMercator().scale(150).translate([width / 2, height / 1.5]);
-  const path = d3.geoPath().projection(projection);
-  
-  try {
-    const world = await d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson");
-    g.selectAll("path")
-      .data(world.features)
-      .enter().append("path")
-      .attr("d", path)
-      .attr("fill", "#f3f4f6")
-      .attr("stroke", "#d1d5db")
-      .attr("stroke-width", 0.5);
-    
-    const countryGroups = {};
-    writers.forEach(w => {
-      const countries = extractCountryFromBio(w);
-      countries.forEach(c => {
-        if (!countryGroups[c]) countryGroups[c] = { name: c, count: 0, authors: [] };
-        countryGroups[c].count++;
-        countryGroups[c].authors.push({ id: w.id, name: w.name });
-      });
-    });
-    
-    const radiusScale = d3.scaleSqrt().domain([1, 25]).range([12, 45]);
-    
-    const dots = g.selectAll(".country-group")
-      .data(Object.keys(countryGroups).map(k => {
-        const p = projection(countryCoords[k] || [0,0]);
-        return { ...countryGroups[k], x: p[0], y: p[1] };
-      }).filter(d => d.x !== 0))
-      .enter().append("g")
-      .attr("transform", d => `translate(${d.x}, ${d.y})`);
-    
-    dots.append("circle")
-      .attr("r", d => radiusScale(d.count))
-      .attr("fill", d => d.name === "España" ? "rgba(243, 114, 44, 0.6)" : "rgba(123, 44, 191, 0.6)")
-      .attr("stroke", d => d.name === "España" ? "#f3722c" : "#7b2cbf")
-      .attr("stroke-width", 2)
-      .style("cursor", "pointer")
-      .on("mouseenter", function(e, d) {
-        d3.select(this).attr("opacity", 1).attr("stroke-width", 4);
-        
-        // ✅ CAMBIO PRINCIPAL: Usar openModal() en vez de openWriterModal()
-        const listHtml = d.authors.sort((a,b) => a.name.localeCompare(b.name))
-          .map(a => `<div class="writer-item-link"
-            style="padding:8px; border-bottom:1px solid #eee; color:#7b2cbf; cursor:pointer;"
-            onclick="openModal(${a.id}); d3.select('#map-list-tooltip').style('display','none');">
-            • ${a.name}
-          </div>`).join("");
-        
-        tooltip.style("display", "block")
-          .html(`<div style="font-weight:bold; padding-bottom:5px; border-bottom:2px solid #7b2cbf; margin-bottom:8px;">${d.name} (${d.count})</div>` + listHtml)
-          .style("left", (e.pageX + 15) + "px")
-          .style("top", (e.pageY - 15) + "px");
-      });
-    
-    svg.on("click", () => tooltip.style("display", "none"));
-    
-    dots.append("text")
-      .text(d => d.count)
-      .attr("text-anchor", "middle")
-      .attr("dy", ".35em")
-      .attr("fill", "#fff")
-      .style("font-weight", "bold")
-      .style("pointer-events", "none")
-      .style("font-size", d => (radiusScale(d.count) * 0.7) + "px");
-      
-  } catch (err) { console.error(err); }
+    }, 800);
+  }
 }
 
-// vista inicial
-drawTimeline();
-
-
-
-
-
-
-
-
-
-
-    </script>
-
-
-
-
+function showGallery() {
+  // Scroll suave al inicio de la página
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+  
+  // Opcional: destacar visualmente la sección de búsqueda
+  setTimeout(() => {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.focus();
+      searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, 800);
+}
+</script>
 <div id="visualization-block">
   <h2 style="text-align:center; margin-bottom:20px;">Mapa de Relaciones entre Escritoras</h2>
-
-  <div id="view-selector">
-    <button onclick="drawTimeline()">Línea temporal</button>
-    <button onclick="drawMap()">Mapa mundi</button>
+  
+  <!-- LEYENDA ELEGANTE -->
+  <div class="flex justify-center gap-8 mb-6 text-sm">
+    <div class="flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-full border border-orange-200">
+      <div class="w-3 h-3 rounded-full bg-orange-500 border-2 border-white shadow"></div>
+      <span class="text-orange-800 font-medium" data-es="En biblioteca" data-va="A la biblioteca">En biblioteca</span>
+    </div>
+    <div class="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full border border-purple-200">
+      <div class="w-3 h-3 rounded-full bg-purple-600 border-2 border-white shadow"></div>
+      <span class="text-purple-800 font-medium" data-es="No disponible" data-va="No disponible">No disponible</span>
+    </div>
   </div>
-
+  
+  <div id="view-selector" class="mb-6 flex justify-center gap-4">
+    <button onclick="drawTimeline()" class="px-6 py-3 bg-purple-100 text-purple-700 rounded-lg font-semibold hover:bg-purple-200 transition-colors border-2 border-purple-300">
+      <i class="fa-solid fa-timeline mr-2"></i>Línea temporal
+    </button>
+    <button onclick="drawMap()" class="px-6 py-3 bg-orange-100 text-orange-700 rounded-lg font-semibold hover:bg-orange-200 transition-colors border-2 border-orange-300">
+      <i class="fa-solid fa-earth-americas mr-2"></i>Mapa mundi
+    </button>
+    <button onclick="showGallery()" class="px-6 py-3 bg-green-100 text-green-700 rounded-lg font-semibold hover:bg-green-200 transition-colors border-2 border-green-300">
+      <i class="fa-solid fa-id-card mr-2"></i><span data-es="Fichas" data-va="Fitxes">Fichas</span>
+    </button>
+  </div>
   <svg id="mindmap" width="1100" height="750"></svg>
 </div>
-
-
-
-
-
-
-
-
-</main>
-
-    <footer class="mt-20 pb-12 text-center border-t border-purple-100 pt-10">
-        <div class="max-w-4xl mx-auto px-6">
-            <p class="text-[11px] text-purple-400 uppercase tracking-widest font-bold mb-3">Crèdits d'Imatges</p>
-            <p class="text-xs text-gray-500 leading-relaxed max-w-2xl mx-auto">
-                Les imatges utilitzades en aquest arxiu provenen de <strong>Wikimedia Commons</strong> i estan subjectes a les seues respectives llicències (Creative Commons o Domini Públic). 
-                L'atribució específica de cada obra i autor es pot consultar en la font original de cada fitxer a la plataforma de Wikimedia.
-            </p>
-            <div class="mt-6 flex justify-center gap-6 text-purple-300">
-                <i class="fab fa-creative-commons text-2xl"></i>
-                <i class="fab fa-creative-commons-by text-2xl"></i>
-                <i class="fab fa-wikipedia-w text-2xl"></i>
-            </div>
-            <p class="mt-8 text-[10px] text-gray-400 italic">© Biblioteca de Xilxes - Arxiu d'Escriptores</p>
-        </div>
-    </footer>
-
+<footer class="mt-20 pb-12 text-center border-t border-purple-100 pt-10">
+<div class="max-w-4xl mx-auto px-6">
+<p class="text-[11px] text-purple-400 uppercase tracking-widest font-bold mb-3">Crèdits d'Imatges</p>
+<p class="text-xs text-gray-500 leading-relaxed max-w-2xl mx-auto">
+Les imatges utilitzades en aquest arxiu provenen de <strong>Wikimedia Commons</strong> i estan subjectes a les seues respectives llicències (Creative Commons o Domini Públic).
+L'atribució específica de cada obra i autor es pot consultar en la font original de cada fitxer a la plataforma de Wikimedia.
+</p>
+<div class="mt-6 flex justify-center gap-6 text-purple-300">
+<i class="fab fa-creative-commons text-2xl"></i>
+<i class="fab fa-creative-commons-by text-2xl"></i>
+<i class="fab fa-wikipedia-w text-2xl"></i>
+</div>
+<p class="mt-8 text-[10px] text-gray-400 italic">© Biblioteca de Xilxes - Arxiu d'Escriptores</p>
+</div>
+</footer>
 </body>
 </html>
+
