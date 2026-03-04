@@ -122,18 +122,16 @@ object-position: center top;
 }
 
 </style>		
-</div>
+
 </head>
 <body class="pb-12">
-</head>
-<body class="pb-12">
+
 
 <!-- HEADER SUPERIOR CON GIF -->
-
 <header class="bg-white border-b border-purple-100 shadow-sm">
   <div class="gif-frame">
     <div class="gif-container">
-      <img src="https://github.com/xilbi/arxiu-escriptores/blob/main/images/videoDD8m.gif" alt="Presentación de las escritoras">
+      <img src="images/videoDD8m.gif" alt="Presentación de las escritoras">
     </div>
   </div>
 </header>
@@ -172,7 +170,7 @@ class="w-full pl-14 pr-6 py-4 rounded-2xl border-2 border-purple-100 bg-white se
 <!-- BOTONES DE VISUALIZACIÓN ELEGANTES -->
 <section class="py-8 px-4 bg-white border-y border-purple-100">
   <div class="max-w-4xl mx-auto text-center">
-    <p class="text-sm text-gray-600 mb-6 italic">Explora las conexiones geográficas y temporales de las escritoras</p>
+    <p id="explore-text" class="text-sm text-gray-600 mb-6 italic">Explora las conexiones geográficas y temporales de las escritoras</p>
     <div class="flex flex-wrap justify-center gap-4">
       <button onclick="scrollToVisualization('timeline')" 
               class="group relative px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-bold shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 overflow-hidden">
@@ -283,10 +281,26 @@ let currentView = 'gallery';
 let currentEra = 'all';
 // DICCIONARIO DE INTERFAZ
 const i18n = {
-es: { title: "Archivo de Escritoras", subtitle: "Un recorrido por las voces femeninas que han transformado el pensamiento y la literatura universal.", search: "Buscar escritora...", all: "Todas", valencian: "Valencianas", works: "Obras Destacadas", library: "En Biblioteca Xilxes" },
-va: { title: "Arxiu d'Escriptores", subtitle: "Un recorregut per les veus femenines que han transformat el pensament i la literatura universal.", search: "Buscar escriptora...", all: "Totes", valencian: "Valencianes", works: "Obres Destacades", library: "A la Biblioteca de Xilxes" }
-
-
+es: { 
+  title: "Archivo de Escritoras", 
+  subtitle: "Un recorrido por las voces femeninas que han transformado el pensamiento y la literatura universal.", 
+  search: "Buscar escritora...", 
+  all: "Todas", 
+  valencian: "Valencianas", 
+  works: "Obras Destacadas", 
+  library: "En Biblioteca Xilxes",
+  explore: "Explora las conexiones geográficas y temporales de las escritoras"
+},
+va: { 
+  title: "Arxiu d'Escriptores", 
+  subtitle: "Un recorregut per les veus femenines que han transformat el pensament i la literatura universal.", 
+  search: "Buscar escriptora...", 
+  all: "Totes", 
+  valencian: "Valencianes", 
+  works: "Obres Destacades", 
+  library: "A la Biblioteca de Xilxes",
+  explore: "Explora les connexions geogràfiques i temporals de les escriptores"
+}
 };
         // BASE DE DATOS (AQUÍ DEBES PEGAR TUS 85 OBJETOS TRADUCIDOS)
        // BASE DE DATOS
@@ -1669,6 +1683,10 @@ btnEs.className = "text-xs font-bold px-4 py-1.5 rounded-full transition-all tex
 document.getElementById('main-title').innerText = i18n[lang].title;
 document.getElementById('main-subtitle').innerText = i18n[lang].subtitle;
 document.getElementById('search-input').placeholder = i18n[lang].search;
+document.querySelectorAll('[data-es]').forEach(el => {
+  el.textContent = el.getAttribute(`data-${lang}`);
+});
+document.getElementById('explore-text').innerText = i18n[lang].explore;
 renderFilters();
 filterWriters();
 }
@@ -1969,6 +1987,7 @@ function scrollToVisualization(type) {
     }, 800);
   }
 }
+
 function showGallery() {
   // Scroll suave al inicio de la página
   window.scrollTo({
@@ -1987,7 +2006,20 @@ function showGallery() {
 }
 </script>
 <div id="visualization-block">
-<h2 style="text-align:center; margin-bottom:20px;">Mapa de Relaciones entre Escritoras</h2>
+  <h2 style="text-align:center; margin-bottom:20px;">Mapa de Relaciones entre Escritoras</h2>
+  
+  <!-- LEYENDA ELEGANTE -->
+  <div class="flex justify-center gap-8 mb-6 text-sm">
+    <div class="flex items-center gap-2 bg-orange-50 px-4 py-2 rounded-full border border-orange-200">
+      <div class="w-3 h-3 rounded-full bg-orange-500 border-2 border-white shadow"></div>
+      <span class="text-orange-800 font-medium" data-es="En biblioteca" data-va="A la biblioteca">En biblioteca</span>
+    </div>
+    <div class="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full border border-purple-200">
+      <div class="w-3 h-3 rounded-full bg-purple-600 border-2 border-white shadow"></div>
+      <span class="text-purple-800 font-medium" data-es="No disponible" data-va="No disponible">No disponible</span>
+    </div>
+  </div>
+  
   <div id="view-selector" class="mb-6 flex justify-center gap-4">
     <button onclick="drawTimeline()" class="px-6 py-3 bg-purple-100 text-purple-700 rounded-lg font-semibold hover:bg-purple-200 transition-colors border-2 border-purple-300">
       <i class="fa-solid fa-timeline mr-2"></i>Línea temporal
@@ -1996,10 +2028,10 @@ function showGallery() {
       <i class="fa-solid fa-earth-americas mr-2"></i>Mapa mundi
     </button>
     <button onclick="showGallery()" class="px-6 py-3 bg-green-100 text-green-700 rounded-lg font-semibold hover:bg-green-200 transition-colors border-2 border-green-300">
-      <i class="fa-solid fa-id-card mr-2"></i>Fichas
+      <i class="fa-solid fa-id-card mr-2"></i><span data-es="Fichas" data-va="Fitxes">Fichas</span>
     </button>
   </div>
-<svg id="mindmap" width="1100" height="750"></svg>
+  <svg id="mindmap" width="1100" height="750"></svg>
 </div>
 <footer class="mt-20 pb-12 text-center border-t border-purple-100 pt-10">
 <div class="max-w-4xl mx-auto px-6">
